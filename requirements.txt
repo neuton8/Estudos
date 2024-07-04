@@ -1,0 +1,7 @@
+langchain
+langchain_community
+openai
+seaborn
+matplotlib
+pandas
+python-dotenv
