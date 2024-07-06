@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CE_5.1_por vb</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="estudo-de-caso-5.1">Estudo de caso 5.1</h1>
+<img src="https://drive.google.com/uc?export=view&amp;id=1du2bbjAM4VMziHc2jl9Etk7q26IxuLyy">
+<h2 id="identificando-novos-genes-do-autismo">Identificando novos genes do autismo</h2>
+<h3 id="instruções-de-execução">Instruções de execução</h3>
+<p><strong>Docente</strong>: Caroline Uhler</p>
+<blockquote>
+<h4 id="google-colab-recomendado">Google Colab (recomendado)</h4>
+<p>Caso queira executar o estudo de caso sem precisar instalar um programa/arquivo em seu computador, faça o que está descrito a seguir:</p>
+<ol>
+<li>Acesse o seguinte <em>notebook</em> do Google Colab: <a href="https://drive.google.com/file/d/1IzPtbtj8R7PH_e5OntzkTzaHVHv-QRg8/view?usp=sharing">CE_5.1.ipynb</a></li>
+<li>Selecione a opção “Abrir com Google Colaboratory”</li>
+<li>Copie o <em>notebook</em> em seu próprio Google Drive (pode-se executar o código sem realizar esta etapa porém as alterações não ficarão salvas se parte do código for modificado) --&gt; “Copiar no Drive”</li>
+</ol>
+<h4 id="rstudio">RStudio</h4>
+<p>Acesse os arquivos auxiliares do estudo de caso na pasta: <a href="https://drive.google.com/drive/folders/16buX9QmkjozJ9OrVsPGaQTYbS78crosy?usp=sharing">m5/CE_5.1/R_files</a>.</p>
+<blockquote>
+<p>Depois de baixar os arquivos, execute-os com o programa <a href="https://rstudio.com/">RStudio</a>.</p>
+</blockquote>
+</blockquote>
+<hr>
+<h3 id="introdução">Introdução</h3>
+<p>Neste documento, damos algumas dicas úteis para ajudá-lo a começar a desenvolver seu próprio aplicativo de análise de redes. Este aplicativo o ajudará a determinar os nós importantes em uma rede levando em consideração o conhecimento de outros nós. Este tutorial mostra como essa análise ajuda a resolver o problema da identificação de novos genes candidatos com potencial de causar autismo. Para a execução da tarefa, acesse o <em>notebook</em> anexo que, neste estudo, utiliza a linguagem de programação R.</p>
+<p>Abordaremos os seguintes temas:</p>
+<ul>
+<li>Dados: rede de interação proteína-proteína</li>
+<li>Dados: genes que causam autismo</li>
+<li>Desenvolvimento de um interactoma do autismo</li>
+<li>Análise e propriedades do interactoma do autismo</li>
+<li>Identificação de novos genes candidatos</li>
+</ul>
+<h3 id="dados">Dados:</h3>
+<h4 id="rede-de-interações-proteína-proteína">Rede de interações proteína-proteína</h4>
+<p>Para este estudo de caso, você trabalhará com o conjunto de dados <a href="http://thebiogrid.org">BioGRID</a>, que disponibiliza a rede de interação proteína-proteína humana. Para sua conveniência, fornecemos uma amostra desses dados no arquivo chamado <code>BIOGRID.txt</code>, que você pode usar para a prática deste tutorial.</p>
+<p>Para sua informação, neste tutorial você precisará da biblioteca <a href="https://igraph.org/r/doc/"><code>igraph</code></a> para a linguagem R.  A seção correspondente do <em>notebook</em> anexo deste roteiro lhe possibilitará trabalhar com esses dados de interação proteína-proteína e representar a rede em R.</p>
+<h4 id="genes-causadores-do-autismo">Genes causadores do autismo</h4>
+<p>Agora precisamos identificar uma lista de genes conhecidos por causar autismo. Estes dados são fornecidos pelo <a href="https://gene.sfari.org/autdb/Welcome.do">SFARI Gene</a>. Para este banco de dados, são fornecidos dois arquivos de amostra chamados: <code>gene-id-table.txt</code> e <code>gene-score.csv</code>.</p>
+<p>A seção correspondente do <em>notebook</em> anexo deste roteiro irá guiá-lo na extração de informações sobre os genes conhecidos por causar autismo.</p>
+<h3 id="desenvolver-um-interactoma-do-autismo">Desenvolver um interactoma do autismo</h3>
+<p>Agora que possui uma rede de interação proteína-proteína e identificou os genes ou nós nessa rede que são conhecidos por causar autismo, você pode desenvolver um interactoma do autismo. Primeiro, determine a menor sub-rede da rede de interação proteína-proteína que contém genes do autismo. Isso o ajudará a determinar novos genes candidatos a causar autismo, uma vez que eles serão os genes cruciais nesse interactoma.</p>
+<p>Desenvolva o interactoma do autismo com as árvores de Steiner (ou seja, a sub-rede de menor comprimento que conecta um determinado conjunto de nós). Tanto nos arquivos de R do estudo como no <em>notebook</em> do Google Colab, você encontrará um <em>script</em> em R chamado <code>Steiner_tree.R</code> que lhe será muito útil.</p>
+<p>A seção correspondente do <em>notebook</em> anexo deste <em>script</em> o ajudará a identificar e representar visualmente a árvore de Steiner. Genes com pontuações significativas para causar autismo serão exibidos em vermelho, laranja e amarelo, de acordo com a importância de seus valores. O gráfico de saída é salvo em um arquivo <code>.pdf</code> chamado<code>ASD_interactome.pdf</code>, que você poderá acessar na seção de arquivos do * notebook* em anexo.</p>
+<figure>
+	<img src="https://drive.google.com/uc?export=view&amp;id=1q9cr33WRT8lcRLkL8HymcFEJbT03mUaj" width="75%">
+	<figcaption><b></b></figcaption>
+</figure>
+<h3 id="análise-e-propriedades-do-interactoma-do-autismo">Análise e propriedades do interactoma do autismo</h3>
+<p>Agora você pode analisar as propriedades do interactoma do autismo e compará-lo com os interactomas gerados aleatoriamente. A seção correspondente do <em>notebook</em> anexo deste roteiro o ajudará a fazer essa comparação. Para esta etapa, usaremos a biblioteca <code>sna</code> de R.</p>
+<h3 id="identificação-de-novos-genes-candidatos">Identificação de novos genes candidatos</h3>
+<p>A seguir, use o interactoma do autismo para identificar novos genes com potencial de causar autismo. Para isso, use algumas das medidas de centralidade discutidas neste módulo. Especificamente, nós com alta centralidade de intermediação são bons candidatos para o autismo, uma vez que esses genes são encontrados na maioria das vias mais curtas entre qualquer par de genes de interactoma do autismo (ou seja, são nós através dos quais flui muita informação). Assim, se genes com alta centralidade de intermediação apresentarem defeito, é de se esperar que esse fato venha a causar alterações na expressão de muitos genes do interactoma do autismo e, em particular, também daqueles que já são conhecidos por serem genes causadores do autismo.</p>
+<p>A seção correspondente do <em>notebook</em> anexo deste roteiro ajudará você a identificar nós que ainda não são conhecidos por terem relação com o autismo e que têm a centralidade de intermediação mais alta da árvore de Steiner.</p>
+<hr>
+<img src="https://drive.google.com/uc?export=view&amp;id=1du2bbjAM4VMziHc2jl9Etk7q26IxuLyy">
+<p>©2021 Massachusetts Institute of Technology</p>
+<!--stackedit_data:&#10;eyJoaXN0b3J5IjpbLTE2NDIzMjcwMTQsLTU3MjEyMDc4MCwxMT&#10;UwNTI4MDIzLDcxNjE3ODg1MiwyMTc4MDkyMjUsMTIxMTYwMDg4&#10;OCw3MzA5OTgxMTZdfQ==&#10;-->
+</div>
+</body>
+
+</html>

@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CE_6.2_por vb</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="estudo-de-caso-6.2">Estudo de caso 6.2</h1>
+<img src="https://drive.google.com/uc?export=view&amp;id=1du2bbjAM4VMziHc2jl9Etk7q26IxuLyy">
+<h2 id="design-de-previsões-com-dados-sobre-vendas-no-reino-unido">Design de previsões com dados sobre vendas no Reino Unido</h2>
+<h3 id="instruções-de-execução">Instruções de execução</h3>
+<blockquote>
+<h4 id="google-colab-recomendado">Google Colab (recomendado)</h4>
+<p>Caso queira executar o estudo de caso sem precisar instalar um programa/arquivo em seu computador, faça o que está descrito a seguir:</p>
+<ol>
+<li>Acesse o seguinte <em>notebook</em> do Google Colab: <a href="https://drive.google.com/file/d/1oYru5X98G7z7jeAuQky85hm63aO5Dw8H/view?usp=sharing">CE_6.2.ipynb</a></li>
+<li>Selecione a opção “Abrir com Google Colaboratory”</li>
+<li>Copie o <em>notebook</em> em seu próprio Google Drive (pode-se executar o código sem realizar esta etapa porém as alterações não ficarão salvas se parte do código for modificado) --&gt; “Copiar no Drive”</li>
+</ol>
+</blockquote>
+<hr>
+<h3 id="introdução">Introdução</h3>
+<p>Neste estudo de caso, você trabalhará com a engenharia de previsão, um estágio da modelagem preditiva em que você:</p>
+<ul>
+<li>Define um resultado que deseja prever</li>
+<li>Analisa os dados para encontrar incidentes anteriores do resultado</li>
+<li>Converte esses incidentes anteriores em exemplos de treinamento para aprendizagem de máquina</li>
+</ul>
+<p>Na sequência, você utilizará a <a href="https://www.featuretools.com/"><code>Featuretools</code></a>  para extrair variáveis e aprender um modelo preditivo.</p>
+<p>Neste estudo de caso específico, você deverá se concentrar em um conjunto de dados abertos de venda varejista disponível neste <a href="http://archive.ics.uci.edu/ml/datasets/online+retail">link</a>. O problema de previsão será definido com o caso em que o cliente tem mais de K compras.</p>
+<h3 id="º-passo-carregar-e-preparar-os-dados">1º Passo: Carregar e preparar os dados</h3>
+<p>O <em>notebook</em> anexo do estudo de caso baixa e abre os arquivos para você.</p>
+<p>O conjunto de dados contém as seguintes tabelas: <code>item_purchases</code>, <code>invoices</code>, <code>items</code>,<code>customers</code>.</p>
+<p>As seguintes relações são existentes:</p>
+<ul>
+<li>Um cliente pode ter várias faturas</li>
+<li>Eles podem ter comprado um item várias vezes</li>
+<li>Uma fatura pode conter compras de vários itens</li>
+</ul>
+<h3 id="º-passo-encontrar-exemplos-de-treinamento">2º Passo: Encontrar exemplos de treinamento</h3>
+<p>No fragmento de código a seguir, tente encontrar os exemplos de treinamento de dados. Defina os seguintes parâmetros:</p>
+<ul>
+<li><code>prediction_window</code> = 14 dias</li>
+<li><code>training_window</code> = 21 dias</li>
+<li><code>lead</code> = 7 dias</li>
+<li><code>threshold</code> = 2 (especifica a quantidade de compras que o cliente deve fazer no futuro para ser considerado envolvido)</li>
+</ul>
+<p>No <em>notebook</em> anexo do estudo, você verá os primeiros cinco exemplos de treinamento. A primeira coluna é a ID do cliente; a segunda coluna é o registro de data/hora, após o qual você pode usar os dados para gerar variáveis; a terceira coluna é o último registro da hora para usar os dados do cliente e a quarta coluna é o rótulo. É <code>True</code> se o cliente fez mais de cinco compras no período entre (<code>cutoff_time</code>, <code>cutoff_time + prediction_window</code>).</p>
+<h3 id="º-passo-gerar-variáveis">3º Passo: Gerar variáveis</h3>
+<p>A seguir, gere variáveis ​​para cada um dos exemplos de treinamento. Use a <code>featuretools</code> para gerar as variáveis. <code>featuretools</code> é um software automatizado de engenharia de variáveis. O uso deste pacote de <em>software</em> é explorado no estudo de caso sobre as corridas de táxi em Nova York. Aqui você simplesmente usará a ferramenta para gerar variáveis.</p>
+<h3 id="º-passo-treinar-um-modelo-com-random-forest">4º Passo: Treinar um modelo com <em>Random Forest</em></h3>
+<p>Agora você está pronto para treinar um modelo e avaliá-lo. Para isso:</p>
+<ul>
+<li>Primeiro, separe os exemplos de treinamento em train_test_split</li>
+<li>Atribua os valores ausentes</li>
+<li>Treine um modelo com dados de treinamento</li>
+<li>Teste os dados reservados para o teste</li>
+<li>Separe os dados com a função <code>train_test_split</code> e especifique a proporção que deseja para fazer o teste.</li>
+</ul>
+<p>Você pode imputar valores ausentes ou valores <code>NaN</code> na <code>feature_matrix</code> com o <code>SimpleImputer</code> da biblioteca <code>scikit-learn</code>. Substitua os valores <code>NaN</code> em cada coluna de variáveis ​​pela média do resto das entradas em cada coluna. Abaixo vemos uma estratégia simples de atribuição.</p>
+<pre class=" language-python"><code class="prism  language-python">imp <span class="token operator">=</span> SimpleImputer<span class="token punctuation">(</span>missing_values<span class="token operator">=</span>np<span class="token punctuation">.</span>nan<span class="token punctuation">,</span>
+					strategy<span class="token operator">=</span><span class="token string">'mean'</span><span class="token punctuation">)</span> 
+imp <span class="token operator">=</span> imp<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_train<span class="token punctuation">)</span> 
+X_train_imp <span class="token operator">=</span> imp<span class="token punctuation">.</span>transform<span class="token punctuation">(</span>X_train<span class="token punctuation">)</span> 
+</code></pre>
+<p>Prossiga para o treinamento do classificador <em>Random Forest</em> (um tipo de classificador baseado em árvores de regressão). Use também o pacote <code>scikit-learn</code> para fazer isso, conforme descrito no <em>notebook</em> anexo deste estudo de caso.</p>
+<h3 id="º-passo-avaliar-o-modelo">5º Passo: Avaliar o modelo</h3>
+<p>Finalmente, para avaliar o modelo, atribua os valores ausentes e, em seguida, use o classificador treinado para prever os rótulos. Tudo isso pode ser encontrado no <em>notebook</em> anexo deste estudo.</p>
+<hr>
+<img src="https://drive.google.com/uc?export=view&amp;id=1du2bbjAM4VMziHc2jl9Etk7q26IxuLyy">
+<p>©2021 Massachusetts Institute of Technology</p>
+<!--stackedit_data:&#10;eyJoaXN0b3J5IjpbNTQ0NzU5OTc0LC04NjM1NDk5MTQsODUyNz&#10;IwODY4LC0xNDE2OTY0MzYxLC0xNTEwODE5OTc3LC0xNzIwMDQ5&#10;NzM2LDczMDk5ODExNl19&#10;-->
+</div>
+</body>
+
+</html>

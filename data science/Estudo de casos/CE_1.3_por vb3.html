@@ -1,0 +1,194 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CE_1.3_por vb</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="estudo-de-caso-1.3">Estudo de caso 1.3</h1>
+<img src="https://drive.google.com/uc?export=view&amp;id=1du2bbjAM4VMziHc2jl9Etk7q26IxuLyy">
+<h2 id="pca---identificação-facial"><em>PCA</em> - Identificação facial</h2>
+<p><strong>Docente</strong>: Stefanie Jegelka</p>
+<h3 id="instruções-de-execução">Instruções de execução</h3>
+<blockquote>
+<h4 id="google-colab-recomendado">Google Colab (recomendado)</h4>
+<p>Caso queira executar o estudo de caso em Python sem precisar instalar um programa/arquivo em seu computador, faça o que está descrito a seguir:</p>
+<ol>
+<li>Acesse o seguinte <em>notebook</em> do Google Colab: <a href="https://drive.google.com/file/d/1oqOavmDLYBJpYr9wgCfvAnGcUdp_qTA6/view?usp=sharing">CE_1.3.ipynb</a></li>
+<li>Escolha a opção “Abrir com Google Colaboratory”</li>
+<li>Copie o <em>notebook</em> em seu próprio Google Drive (pode-se executar o código sem realizar esta etapa porém as alterações não ficarão salvas se parte do código for modificado) --&gt; “Copiar no Drive”</li>
+</ol>
+</blockquote>
+<hr>
+<h3 id="introdução">Introdução</h3>
+<p>Neste documento, revisaremos algumas dicas úteis para que você possa começar a desenvolver seu próprio aplicativo de classificação de imagens de rostos através da Análise de Componentes Principais (<em>PCA</em>, na sigla em inglês).</p>
+<p>Caso queira saber mais sobre o tema, consulte os seguintes artigos e recursos:</p>
+<ul>
+<li>Artigo original de Matthew A. Turk e Alex P. Pentland: <a href="http://www.mit.edu/~9.54/fall14/Classes/class10/Turk%20Pentland%20Eigenfaces.pdf">Face Recognition Using Eigenfaces</a></li>
+<li>Estudo de caso de JHU: <a href="http://www.vision.jhu.edu/teaching/vision08/Handouts/case_study_pca1.pdf">Eigenfaces for Face Detection/Recognition</a></li>
+<li>Entradas de blogs:
+<ul>
+<li><a href="https://sandipanweb.wordpress.com/2018/01/06/eigenfaces-and-a-simple-face-detector-with-pca-svd-in-python/">EigenFaces and A Simple Face Detector with PCA/SVD in Python</a></li>
+<li><a href="https://medium.com/@lwj.liuwenjing/how-to-get-eigenfaces-a9caeeba8767">How to Get Eigenfaces</a> (<a href="https://colab.research.google.com/drive/1T3cSvQZjKhh8s3Dxrb9gPCWhwhcz4Bmo#scrollTo=q2mPsa4M3Jkc">source code</a>)</li>
+<li><a href="https://towardsdatascience.com/eigenfaces-recovering-humans-from-ghosts-17606c328184">Eigenfaces: Recovering Humans from Ghosts</a></li>
+</ul>
+</li>
+</ul>
+<p>O estudo original foi elaborado na linguagem de programação Matlab, mas decidimos disponibilizar uma versão traduzida em Python para evitar a necessidade de instalar um software que não seja de código livre.</p>
+<h3 id="dados">Dados</h3>
+<p>Neste exemplo, é utilizado o banco de dados público <a href="http://conradsanderson.id.au/lfwcrop/">LFWcrop</a>, desenvolvido por Conrad Sanderson. Esse banco de dados é um subconjunto de um banco de dados maior chamado <a href="http://vis-www.cs.umass.edu/lfw/">Labeled Faces in the Wild</a> (LFW), e que é bastante utilizado em <em>computer vision</em>.</p>
+<p>Este banco de dados é composto por imagens de 64x64 pixels, contendo rostos de pessoas. As imagens estão cortadas de forma que o rosto ocupe toda a imagem. A versão em escala de cinza de todas as imagens pode ser encontrada em <a href="https://drive.google.com/drive/folders/1sdDB6utZeRGOgfF7PZhk6wTj3Qhjv1Fm?usp=sharing"><code>Data/lfwcrop_grey_faces</code></a>. O banco de dados conta com 13233 imagens, mas neste exemplo usaremos 100 imagens para o cálculo de nossas <em>eigenfaces</em>, e 16 imagens de teste. Uma vantagem do banco de dados LFWcrop é que às vezes ele contém mais de um rosto da mesma pessoa. As 16 imagens de teste são de pessoas que também estão presentes no conjunto de imagens de treinamento. Graças a isso, podemos observar como funcionam nossas <em>eigenfaces</em> com três tipos de imagens:</p>
+<ul>
+<li>Imagens que fazem parte do conjunto de treinamento.</li>
+<li>Imagens que não fazem parte do conjunto de treinamento mas que pertencem a pessoas que estão presentes nele.</li>
+<li>Imagens de pessoas que não estão no conjunto de treinamento.</li>
+</ul>
+<p>O código que você encontrará no Google Colab importa automaticamente o conjunto de treinamento e o de teste em dois arquivos <code>.zip</code>, que são posteriormente descompactados no próprio espaço de execução. Lembrando que você pode inspecionar seu espaço de execução no Google Colab na barra de ferramentas situada na lateral esquerda do <em>notebook</em>, mais precisamente na pasta <code>/content/</code>:</p>
+<figure>
+	<img src="https://drive.google.com/uc?export=view&amp;id=1TUJU3a8i8YwKK2QrQ6b6fUUGVhdsx8Jh">
+	<figcaption><b>Figura 1.</b> Espaço de execução ou <i>working directory</i> no Google Colab.</figcaption>
+</figure>
+<p>Para ler as imagens e salvá-las em uma variável, você pode usar as seguintes linhas de código:</p>
+<pre class=" language-python"><code class="prism  language-python">S_raw <span class="token operator">=</span> np<span class="token punctuation">.</span>ndarray<span class="token punctuation">(</span><span class="token punctuation">(</span>irow<span class="token operator">*</span>icol<span class="token punctuation">,</span>M<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span>  <span class="token builtin">range</span><span class="token punctuation">(</span>M<span class="token punctuation">)</span><span class="token punctuation">:</span>
+	<span class="token comment">#Leer img</span>
+	img <span class="token operator">=</span> io<span class="token punctuation">.</span>imread<span class="token punctuation">(</span><span class="token string">'training_set/{}'</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>training_set_filenames<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	img <span class="token operator">=</span> color<span class="token punctuation">.</span>rgb2gray<span class="token punctuation">(</span>img<span class="token punctuation">)</span>
+	img <span class="token operator">=</span> transform<span class="token punctuation">.</span>resize<span class="token punctuation">(</span>img<span class="token punctuation">,</span>  <span class="token punctuation">(</span>irow<span class="token punctuation">,</span>icol<span class="token punctuation">)</span><span class="token punctuation">,</span>anti_aliasing<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+	<span class="token comment">#Añadir img a la matriz</span>
+	S_raw<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>i<span class="token punctuation">]</span><span class="token operator">=</span> img<span class="token punctuation">.</span>flatten<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+</code></pre>
+<p>Caso deseje, você pode complementar este estudo de caso com uma coleção de imagens alternativa. Para isso, cada imagem deverá ser salva separadamente e todas terão que apresentar as seguintes características:</p>
+<ol>
+<li>O rosto deve ocupar uma grande parte da área da imagem.</li>
+<li>Na medida do possível, a pessoa na imagem deve estar olhando diretamente para a câmera.</li>
+</ol>
+<h3 id="cálculo-das-eigenfaces">Cálculo das <em>eigenfaces</em></h3>
+<p>Para calcular todas as <em>eigenfaces</em>, precisamos executar várias etapas:</p>
+<ol>
+<li>Primeiramente, temos que padronizar e centralizar cada imagem. As seguintes linhas de código lhe ajudarão a fazer isso e a visualizar as imagens padronizadas:</li>
+</ol>
+<pre class=" language-python"><code class="prism  language-python">S_processed <span class="token operator">=</span> S_raw<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+plot_images<span class="token punctuation">(</span>S_raw<span class="token punctuation">,</span>title<span class="token operator">=</span><span class="token string">'Imagens brutas (RAW)'</span><span class="token punctuation">)</span>
+<span class="token comment">#Normalización</span>
+um <span class="token operator">=</span> S_processed<span class="token punctuation">.</span>mean<span class="token punctuation">(</span>axis<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span>
+ustd <span class="token operator">=</span> S_processed<span class="token punctuation">.</span>std<span class="token punctuation">(</span>axis<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span>  <span class="token builtin">range</span><span class="token punctuation">(</span>M<span class="token punctuation">)</span><span class="token punctuation">:</span>
+	S_processed<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span>S_processed<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>i<span class="token punctuation">]</span> <span class="token operator">-</span> S_processed<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>mean<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">*</span> ustd<span class="token operator">/</span>S_processed<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>std<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> um
+	plot_images<span class="token punctuation">(</span>S_processed<span class="token punctuation">,</span>title<span class="token operator">=</span><span class="token string">'Imagens normalizadas'</span><span class="token punctuation">)</span>
+
+<span class="token comment">#Centrado</span>
+mean_img <span class="token operator">=</span> S_processed<span class="token punctuation">.</span>mean<span class="token punctuation">(</span>axis<span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span>  <span class="token builtin">range</span><span class="token punctuation">(</span>M<span class="token punctuation">)</span><span class="token punctuation">:</span>
+	S_processed<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> S_processed<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>i<span class="token punctuation">]</span> <span class="token operator">-</span> mean_img
+
+plot_images<span class="token punctuation">(</span>S_raw<span class="token punctuation">,</span>title<span class="token operator">=</span><span class="token string">'Imagens brutas (RAW)'</span><span class="token punctuation">)</span>
+</code></pre>
+<ol start="2">
+<li>Após isso, precisamos calcular um rosto médio de todos os rostos padronizados. As seguintes linhas de código calcularão e exibirão o rosto médio:</li>
+</ol>
+<pre class=" language-python"><code class="prism  language-python">ax<span class="token punctuation">,</span>fig <span class="token operator">=</span> plt<span class="token punctuation">.</span>subplots<span class="token punctuation">(</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>imshow<span class="token punctuation">(</span>skimage<span class="token punctuation">.</span>img_as_ubyte<span class="token punctuation">(</span>mean_img<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span><span class="token punctuation">(</span>irow<span class="token punctuation">,</span>icol<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> cmap<span class="token operator">=</span><span class="token string">'gray'</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>title<span class="token punctuation">(</span><span class="token string">'Imagem média'</span><span class="token punctuation">,</span>fontsize<span class="token operator">=</span> <span class="token number">16</span><span class="token punctuation">)</span>
+fig<span class="token punctuation">.</span>axes<span class="token punctuation">.</span>get_xaxis<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>set_visible<span class="token punctuation">(</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+fig<span class="token punctuation">.</span>axes<span class="token punctuation">.</span>get_yaxis<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>set_visible<span class="token punctuation">(</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<ol start="3">
+<li>Agora você pode calcular as <em>eigenfaces</em> (autovetores da matriz de covariância). O seguinte código calcula todos os componentes necessários para calcular as <em>eigenfaces</em>. O <em>notebook</em> contém algumas explicações adicionais sobre o desenvolvimento matemático específico utilizado para o cálculo das <em>eigenfaces</em>:</li>
+</ol>
+<pre class=" language-python"><code class="prism  language-python"><span class="token comment">#Matriz de covarianza C=AA'</span>
+<span class="token comment">#Calculamos L=A'A porque C é muito grande e difícil de calcular</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Calculando L = A\'A...'</span><span class="token punctuation">)</span>
+A <span class="token operator">=</span> S_processed<span class="token punctuation">.</span>copy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+L <span class="token operator">=</span> np<span class="token punctuation">.</span>matmul<span class="token punctuation">(</span>A<span class="token punctuation">.</span>T<span class="token punctuation">,</span>A<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Dimensões de L: {}\n'</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>L<span class="token punctuation">.</span>shape<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token comment">#Calculando os autovetores e autovalores de L</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Calculando os autovetores e autovalores de L...'</span><span class="token punctuation">)</span>
+dd<span class="token punctuation">,</span> vv <span class="token operator">=</span> np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>eig<span class="token punctuation">(</span>L<span class="token punctuation">)</span>
+<span class="token comment">#vv son los vectores propios de L</span>
+<span class="token comment">#dd son los valores propios de L y C</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Dimensões do conjunto de autovetores vv: {}'</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>vv<span class="token punctuation">.</span>shape<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'||vv_0||= {} (ya está normalizado)\n'</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>norm<span class="token punctuation">(</span>vv<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token comment">#Eliminando os autovetores com autovalor = 0</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Eliminando os autovetores com autovalor = 0 (e seus autovetores correspondentes)\n'</span><span class="token punctuation">)</span>
+threshold <span class="token operator">=</span> <span class="token number">1e</span><span class="token operator">-</span><span class="token number">4</span>
+n <span class="token operator">=</span> <span class="token builtin">sum</span><span class="token punctuation">(</span>dd <span class="token operator">&gt;</span> threshold<span class="token punctuation">)</span>
+d <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span>n<span class="token punctuation">)</span>
+v <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span>vv<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span>n<span class="token punctuation">)</span><span class="token punctuation">)</span>
+j <span class="token operator">=</span> <span class="token number">0</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span>  <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>dd<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+	<span class="token keyword">if</span> dd<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&gt;</span> threshold<span class="token punctuation">:</span>
+		d<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> dd<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+		v<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> vv<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>i<span class="token punctuation">]</span>
+		j <span class="token operator">+=</span> <span class="token number">1</span>
+	<span class="token keyword">else</span><span class="token punctuation">:</span>
+		<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Eliminando dd[{}] y vv[{}] (dd[{}]={})'</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span>i<span class="token punctuation">,</span>i<span class="token punctuation">,</span>dd<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token comment">#Ordenando (crescente)</span>
+v <span class="token operator">=</span> v<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>np<span class="token punctuation">.</span>argsort<span class="token punctuation">(</span>d<span class="token punctuation">)</span><span class="token punctuation">]</span>
+d <span class="token operator">=</span> np<span class="token punctuation">.</span>sort<span class="token punctuation">(</span>d<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'||v_0||= {} (já está normalizado)\n'</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>norm<span class="token punctuation">(</span>v<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token comment">#Autovetores da matriz C</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Calculating the {} higher eigenvectors and eigenvalues of C = AA\' (covariance matrix)...'</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">)</span>
+u <span class="token operator">=</span> np<span class="token punctuation">.</span>matmul<span class="token punctuation">(</span>A<span class="token punctuation">,</span>v<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Dimensões de u: {}'</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>u<span class="token punctuation">.</span>shape<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token comment">#Normalização de C</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'||u_0||= {}\n'</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>norm<span class="token punctuation">(</span>u<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Normalizando os autovetores da matriz C...'</span><span class="token punctuation">)</span>
+u <span class="token operator">=</span> normalize<span class="token punctuation">(</span>u<span class="token punctuation">,</span> axis <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'||u_0||= {}'</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>norm<span class="token punctuation">(</span>u<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token comment">#Mostrar as eigenfaces</span>
+eigen_faces <span class="token operator">=</span> np<span class="token punctuation">.</span>ndarray<span class="token punctuation">(</span><span class="token punctuation">(</span>irow<span class="token operator">*</span>icol<span class="token punctuation">,</span>u<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span>  <span class="token builtin">range</span><span class="token punctuation">(</span>u<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+	eigen_faces<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> exposure<span class="token punctuation">.</span>equalize_hist<span class="token punctuation">(</span>u<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span>nbins<span class="token operator">=</span><span class="token number">256</span><span class="token punctuation">)</span>
+eigen_faces <span class="token operator">=</span> skimage<span class="token punctuation">.</span>img_as_ubyte<span class="token punctuation">(</span>eigen_faces<span class="token punctuation">)</span>
+plot_images<span class="token punctuation">(</span>eigen_faces<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span><span class="token operator">-</span><span class="token number">16</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">,</span>title <span class="token operator">=</span> <span class="token string">'Eigen caras'</span><span class="token punctuation">)</span>
+</code></pre>
+<h3 id="aplicação-das-eigenfaces">Aplicação das <em>eigenfaces</em></h3>
+<p>Neste estudo de caso mostramos duas possíveis aplicações das <em>eigenfaces</em>:</p>
+<h4 id="construção-de-novos-rostos">Construção de novos rostos</h4>
+<p>Para poder construir novos rostos (rostos que não estão no conjunto de treinamento) com base nas <em>eigenfaces</em> calculadas anteriormente, basicamente se constrói uma combinação linear das <em>eigenfaces</em> usando a informação da nova imagem de teste.</p>
+<h4 id="classificação-de-rostos">Classificação de rostos</h4>
+<p>Primeiramente, são calculados os pesos de cada <em>eigenfaces</em> na composição das imagens do conjunto de treinamento. Depois, os pesos das <em>eigenfaces</em> no conjunto de teste são calculados analogamente. Por fim, calculamos a distância (dissimilaridade) entre os pesos da imagem de teste e os pesos obtidos nas imagens do conjunto de treinamento. A menor distância euclidiana corresponde à imagem do conjunto de treinamento com a qual classificaremos a imagem de teste. O código a seguir pode ajudá-lo a fazer essa classificação:</p>
+<pre class=" language-python"><code class="prism  language-python"><span class="token comment">#Cálculo do peso das eigenfaces na nova imagem</span>
+weights <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span>u<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span>T<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span>  <span class="token builtin">range</span><span class="token punctuation">(</span>T<span class="token punctuation">)</span><span class="token punctuation">:</span>
+	weights<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> np<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>u<span class="token punctuation">.</span>T<span class="token punctuation">,</span>S_test<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+omega <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span>u<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span>A<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> h <span class="token keyword">in</span>  <span class="token builtin">range</span><span class="token punctuation">(</span>A<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+	omega<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>h<span class="token punctuation">]</span> <span class="token operator">=</span> np<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>u<span class="token punctuation">.</span>T<span class="token punctuation">,</span> A<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>h<span class="token punctuation">]</span><span class="token punctuation">.</span>T<span class="token punctuation">)</span>
+
+<span class="token comment">#Encontrar a distancia</span>
+e <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span>omega<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span>T<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span>  <span class="token builtin">range</span><span class="token punctuation">(</span>T<span class="token punctuation">)</span><span class="token punctuation">:</span>
+	<span class="token keyword">for</span> j <span class="token keyword">in</span>  <span class="token builtin">range</span><span class="token punctuation">(</span>omega<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+		diff_weight <span class="token operator">=</span> weights<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>i<span class="token punctuation">]</span> <span class="token operator">-</span> omega<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>j<span class="token punctuation">]</span>
+		e<span class="token punctuation">[</span>j<span class="token punctuation">,</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> np<span class="token punctuation">.</span>linalg<span class="token punctuation">.</span>norm<span class="token punctuation">(</span>diff_weight<span class="token punctuation">)</span>
+
+ax<span class="token punctuation">,</span> fig <span class="token operator">=</span> plt<span class="token punctuation">.</span>subplots<span class="token punctuation">(</span>figsize<span class="token operator">=</span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">,</span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>plot<span class="token punctuation">(</span>e<span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>title<span class="token punctuation">(</span><span class="token string">'Distancia euclidiana das imagens de teste'</span><span class="token punctuation">,</span>fontsize <span class="token operator">=</span> <span class="token number">14</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>xlabel<span class="token punctuation">(</span><span class="token string">'Número da imagem de treinamento'</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>ylabel<span class="token punctuation">(</span><span class="token string">'Distancia'</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<hr>
+<img src="https://drive.google.com/uc?export=view&amp;id=1du2bbjAM4VMziHc2jl9Etk7q26IxuLyy">
+<p>©2021 Massachusetts Institute of Technology</p>
+<!--stackedit_data:&#10;eyJoaXN0b3J5IjpbODA1NzI5MzMyLDgwMjc0ODI0MCwxNjM1Nz&#10;IxODcsNDI2MjEyMzgwLDczMDk5ODExNl19&#10;-->
+</div>
+</body>
+
+</html>
