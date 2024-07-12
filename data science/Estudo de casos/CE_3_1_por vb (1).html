@@ -1,0 +1,647 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CE_3_1_por vb</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="estudo-de-caso-3.1">Estudo de caso 3.1</h1>
+<img src="https://drive.google.com/uc?export=view&amp;id=1du2bbjAM4VMziHc2jl9Etk7q26IxuLyy">
+<h2 id="o-lançamento-do-challenger">O lançamento do Challenger</h2>
+<h3 id="instruções-de-execução">Instruções de execução</h3>
+<blockquote>
+<h4 id="google-colab-recomendado">Google Colab (recomendado)</h4>
+<p>Caso queira executar o estudo de caso em Python sem precisar instalar um programa/arquivo em seu computador, faça o que está descrito a seguir:</p>
+<ol>
+<li>Acesse o seguinte <em>notebook</em> do Google Colab: <a href="https://drive.google.com/file/d/13YDh2oGXal-hrFLr7PBHZ5w1FZHhHzeY/view?usp=sharing">CE_3.1.ipynb</a></li>
+<li>Escolha a opção “Abrir com Google Colaboratory”</li>
+<li>Copie o <em>notebook</em> em seu próprio Google Drive (pode-se executar o código sem realizar esta etapa porém as alterações não ficarão salvas se parte do código for modificado) --&gt; “Copiar no Drive”</li>
+</ol>
+</blockquote>
+<hr>
+<h3 id="dados">Dados</h3>
+<p>A seguir são apresentados todos os dados das observações que compõem o banco de dados com o qual será desenvolvido o estudo de caso. Os dados são distribuídos em três colunas:</p>
+<ul>
+<li><strong>Observação</strong>: é simplesmente o número da observação.</li>
+<li><strong>Y</strong>: rótulo de falha/sucesso para cada observação. Falha: Y=1. Demais casos: Y=0.</li>
+<li><strong>X</strong>: temperatura (em graus Fahrenheit) no instante do lançamento.</li>
+</ul>
+
+<table>
+<thead>
+<tr>
+<th align="center"><strong>Observation</strong></th>
+<th align="center"><strong>Y</strong></th>
+<th align="center"><strong>X</strong></th>
+<th></th>
+<th align="center"><strong>Observation</strong></th>
+<th align="center"><strong>Y</strong></th>
+<th align="center"><strong>X</strong></th>
+<th></th>
+<th align="center"><strong>Observation</strong></th>
+<th align="center"><strong>Y</strong></th>
+<th align="center"><strong>X</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">53</td>
+<td></td>
+<td align="center">41</td>
+<td align="center">0</td>
+<td align="center">68</td>
+<td></td>
+<td align="center">81</td>
+<td align="center">1</td>
+<td align="center">75</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">53</td>
+<td></td>
+<td align="center">42</td>
+<td align="center">0</td>
+<td align="center">68</td>
+<td></td>
+<td align="center">82</td>
+<td align="center">1</td>
+<td align="center">75</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="center">1</td>
+<td align="center">53</td>
+<td></td>
+<td align="center">43</td>
+<td align="center">0</td>
+<td align="center">68</td>
+<td></td>
+<td align="center">83</td>
+<td align="center">0</td>
+<td align="center">75</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="center">0</td>
+<td align="center">53</td>
+<td></td>
+<td align="center">44</td>
+<td align="center">0</td>
+<td align="center">68</td>
+<td></td>
+<td align="center">84</td>
+<td align="center">0</td>
+<td align="center">75</td>
+</tr>
+<tr>
+<td align="center">5</td>
+<td align="center">0</td>
+<td align="center">53</td>
+<td></td>
+<td align="center">45</td>
+<td align="center">0</td>
+<td align="center">68</td>
+<td></td>
+<td align="center">85</td>
+<td align="center">0</td>
+<td align="center">75</td>
+</tr>
+<tr>
+<td align="center">6</td>
+<td align="center">1</td>
+<td align="center">57</td>
+<td></td>
+<td align="center">46</td>
+<td align="center">0</td>
+<td align="center">69</td>
+<td></td>
+<td align="center">86</td>
+<td align="center">0</td>
+<td align="center">75</td>
+</tr>
+<tr>
+<td align="center">7</td>
+<td align="center">0</td>
+<td align="center">57</td>
+<td></td>
+<td align="center">47</td>
+<td align="center">0</td>
+<td align="center">69</td>
+<td></td>
+<td align="center">87</td>
+<td align="center">0</td>
+<td align="center">75</td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td align="center">0</td>
+<td align="center">57</td>
+<td></td>
+<td align="center">48</td>
+<td align="center">0</td>
+<td align="center">69</td>
+<td></td>
+<td align="center">88</td>
+<td align="center">0</td>
+<td align="center">75</td>
+</tr>
+<tr>
+<td align="center">9</td>
+<td align="center">0</td>
+<td align="center">57</td>
+<td></td>
+<td align="center">49</td>
+<td align="center">0</td>
+<td align="center">69</td>
+<td></td>
+<td align="center">89</td>
+<td align="center">0</td>
+<td align="center">75</td>
+</tr>
+<tr>
+<td align="center">10</td>
+<td align="center">0</td>
+<td align="center">57</td>
+<td></td>
+<td align="center">50</td>
+<td align="center">0</td>
+<td align="center">69</td>
+<td></td>
+<td align="center">90</td>
+<td align="center">0</td>
+<td align="center">75</td>
+</tr>
+<tr>
+<td align="center">11</td>
+<td align="center">1</td>
+<td align="center">58</td>
+<td></td>
+<td align="center">51</td>
+<td align="center">1</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">91</td>
+<td align="center">0</td>
+<td align="center">76</td>
+</tr>
+<tr>
+<td align="center">12</td>
+<td align="center">0</td>
+<td align="center">58</td>
+<td></td>
+<td align="center">52</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">92</td>
+<td align="center">0</td>
+<td align="center">76</td>
+</tr>
+<tr>
+<td align="center">13</td>
+<td align="center">0</td>
+<td align="center">58</td>
+<td></td>
+<td align="center">53</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">93</td>
+<td align="center">0</td>
+<td align="center">76</td>
+</tr>
+<tr>
+<td align="center">14</td>
+<td align="center">0</td>
+<td align="center">58</td>
+<td></td>
+<td align="center">54</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">94</td>
+<td align="center">0</td>
+<td align="center">76</td>
+</tr>
+<tr>
+<td align="center">15</td>
+<td align="center">0</td>
+<td align="center">58</td>
+<td></td>
+<td align="center">55</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">95</td>
+<td align="center">0</td>
+<td align="center">76</td>
+</tr>
+<tr>
+<td align="center">16</td>
+<td align="center">1</td>
+<td align="center">63</td>
+<td></td>
+<td align="center">56</td>
+<td align="center">1</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">96</td>
+<td align="center">0</td>
+<td align="center">76</td>
+</tr>
+<tr>
+<td align="center">17</td>
+<td align="center">0</td>
+<td align="center">63</td>
+<td></td>
+<td align="center">57</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">97</td>
+<td align="center">0</td>
+<td align="center">76</td>
+</tr>
+<tr>
+<td align="center">18</td>
+<td align="center">0</td>
+<td align="center">63</td>
+<td></td>
+<td align="center">58</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">98</td>
+<td align="center">0</td>
+<td align="center">76</td>
+</tr>
+<tr>
+<td align="center">19</td>
+<td align="center">0</td>
+<td align="center">63</td>
+<td></td>
+<td align="center">59</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">99</td>
+<td align="center">0</td>
+<td align="center">76</td>
+</tr>
+<tr>
+<td align="center">20</td>
+<td align="center">0</td>
+<td align="center">63</td>
+<td></td>
+<td align="center">60</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">100</td>
+<td align="center">0</td>
+<td align="center">76</td>
+</tr>
+<tr>
+<td align="center">21</td>
+<td align="center">0</td>
+<td align="center">66</td>
+<td></td>
+<td align="center">61</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">101</td>
+<td align="center">0</td>
+<td align="center">78</td>
+</tr>
+<tr>
+<td align="center">22</td>
+<td align="center">0</td>
+<td align="center">66</td>
+<td></td>
+<td align="center">62</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">102</td>
+<td align="center">0</td>
+<td align="center">78</td>
+</tr>
+<tr>
+<td align="center">23</td>
+<td align="center">0</td>
+<td align="center">66</td>
+<td></td>
+<td align="center">63</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">103</td>
+<td align="center">0</td>
+<td align="center">78</td>
+</tr>
+<tr>
+<td align="center">24</td>
+<td align="center">0</td>
+<td align="center">66</td>
+<td></td>
+<td align="center">64</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">104</td>
+<td align="center">0</td>
+<td align="center">78</td>
+</tr>
+<tr>
+<td align="center">25</td>
+<td align="center">0</td>
+<td align="center">66</td>
+<td></td>
+<td align="center">65</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">105</td>
+<td align="center">0</td>
+<td align="center">78</td>
+</tr>
+<tr>
+<td align="center">26</td>
+<td align="center">0</td>
+<td align="center">67</td>
+<td></td>
+<td align="center">66</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">106</td>
+<td align="center">0</td>
+<td align="center">79</td>
+</tr>
+<tr>
+<td align="center">27</td>
+<td align="center">0</td>
+<td align="center">67</td>
+<td></td>
+<td align="center">67</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">107</td>
+<td align="center">0</td>
+<td align="center">79</td>
+</tr>
+<tr>
+<td align="center">28</td>
+<td align="center">0</td>
+<td align="center">67</td>
+<td></td>
+<td align="center">68</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">108</td>
+<td align="center">0</td>
+<td align="center">79</td>
+</tr>
+<tr>
+<td align="center">29</td>
+<td align="center">0</td>
+<td align="center">67</td>
+<td></td>
+<td align="center">69</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">109</td>
+<td align="center">0</td>
+<td align="center">79</td>
+</tr>
+<tr>
+<td align="center">30</td>
+<td align="center">0</td>
+<td align="center">67</td>
+<td></td>
+<td align="center">70</td>
+<td align="center">0</td>
+<td align="center">70</td>
+<td></td>
+<td align="center">110</td>
+<td align="center">0</td>
+<td align="center">79</td>
+</tr>
+<tr>
+<td align="center">31</td>
+<td align="center">0</td>
+<td align="center">67</td>
+<td></td>
+<td align="center">71</td>
+<td align="center">0</td>
+<td align="center">72</td>
+<td></td>
+<td align="center">111</td>
+<td align="center">0</td>
+<td align="center">80</td>
+</tr>
+<tr>
+<td align="center">32</td>
+<td align="center">0</td>
+<td align="center">67</td>
+<td></td>
+<td align="center">72</td>
+<td align="center">0</td>
+<td align="center">72</td>
+<td></td>
+<td align="center">112</td>
+<td align="center">0</td>
+<td align="center">80</td>
+</tr>
+<tr>
+<td align="center">33</td>
+<td align="center">0</td>
+<td align="center">67</td>
+<td></td>
+<td align="center">73</td>
+<td align="center">0</td>
+<td align="center">72</td>
+<td></td>
+<td align="center">113</td>
+<td align="center">0</td>
+<td align="center">80</td>
+</tr>
+<tr>
+<td align="center">34</td>
+<td align="center">0</td>
+<td align="center">67</td>
+<td></td>
+<td align="center">74</td>
+<td align="center">0</td>
+<td align="center">72</td>
+<td></td>
+<td align="center">114</td>
+<td align="center">0</td>
+<td align="center">80</td>
+</tr>
+<tr>
+<td align="center">35</td>
+<td align="center">0</td>
+<td align="center">67</td>
+<td></td>
+<td align="center">75</td>
+<td align="center">0</td>
+<td align="center">72</td>
+<td></td>
+<td align="center">115</td>
+<td align="center">0</td>
+<td align="center">80</td>
+</tr>
+<tr>
+<td align="center">36</td>
+<td align="center">0</td>
+<td align="center">67</td>
+<td></td>
+<td align="center">76</td>
+<td align="center">0</td>
+<td align="center">73</td>
+<td></td>
+<td align="center">116</td>
+<td align="center">0</td>
+<td align="center">81</td>
+</tr>
+<tr>
+<td align="center">37</td>
+<td align="center">0</td>
+<td align="center">67</td>
+<td></td>
+<td align="center">77</td>
+<td align="center">0</td>
+<td align="center">73</td>
+<td></td>
+<td align="center">117</td>
+<td align="center">0</td>
+<td align="center">81</td>
+</tr>
+<tr>
+<td align="center">38</td>
+<td align="center">0</td>
+<td align="center">67</td>
+<td></td>
+<td align="center">78</td>
+<td align="center">0</td>
+<td align="center">73</td>
+<td></td>
+<td align="center">118</td>
+<td align="center">0</td>
+<td align="center">81</td>
+</tr>
+<tr>
+<td align="center">39</td>
+<td align="center">0</td>
+<td align="center">67</td>
+<td></td>
+<td align="center">79</td>
+<td align="center">0</td>
+<td align="center">73</td>
+<td></td>
+<td align="center">119</td>
+<td align="center">0</td>
+<td align="center">81</td>
+</tr>
+<tr>
+<td align="center">40</td>
+<td align="center">0</td>
+<td align="center">67</td>
+<td></td>
+<td align="center">80</td>
+<td align="center">0</td>
+<td align="center">73</td>
+<td></td>
+<td align="center">120</td>
+<td align="center">0</td>
+<td align="center">81</td>
+</tr>
+</tbody>
+</table><p>No <em>notebook</em> do Google Colab associado a este estudo de caso, você poderá encontrar a informação da tabela no arquivo <code>challenger-data.csv</code>. Para acessar essa informação e importá-la para nosso ambiente de execução, basta inserir os seguintes comandos em Python:</p>
+<pre class=" language-python"><code class="prism  language-python"><span class="token keyword">import</span> pandas <span class="token keyword">as</span> pd
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np 
+
+data <span class="token operator">=</span> pd<span class="token punctuation">.</span>read_csv<span class="token punctuation">(</span><span class="token string">"challenger-data.csv"</span><span class="token punctuation">)</span> 
+</code></pre>
+<p>Agora você pode acessar facilmente os dados para análise posterior.</p>
+<h3 id="visualização-dos-dados">Visualização dos dados</h3>
+<p>Com a estrutura de dados, é possível traçar os dados em um gráfico. Por exemplo, caso queira traçar a frequência das falhas a cada temperatura em um gráfico, você pode utilizar a biblioteca <code>matplotlib</code> para gerar os gráficos. Certifique-se de que esteja instalada antes de prosseguir.</p>
+<pre class=" language-python"><code class="prism  language-python"><span class="token comment"># criar subconjuntos de dados</span>
+failures <span class="token operator">=</span> data<span class="token punctuation">.</span>loc<span class="token punctuation">[</span><span class="token punctuation">(</span>data<span class="token punctuation">.</span>Y <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+no_failures <span class="token operator">=</span> data<span class="token punctuation">.</span>loc<span class="token punctuation">[</span><span class="token punctuation">(</span>data<span class="token punctuation">.</span>Y <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">]</span> 
+
+<span class="token comment"># frequências</span>
+failures_freq <span class="token operator">=</span> failures<span class="token punctuation">.</span>X<span class="token punctuation">.</span>value_counts<span class="token punctuation">(</span><span class="token punctuation">)</span>
+no_failures_freq <span class="token operator">=</span> no_failures<span class="token punctuation">.</span>X<span class="token punctuation">.</span>value_counts<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token comment"># mostrar gráficos</span>
+<span class="token keyword">import</span> matplotlib <span class="token keyword">as</span> mpl  
+<span class="token keyword">from</span> matplotlib <span class="token keyword">import</span> pyplot <span class="token keyword">as</span> plt 
+plt<span class="token punctuation">.</span>scatter<span class="token punctuation">(</span>failures_freq<span class="token punctuation">.</span>index<span class="token punctuation">,</span> failures_freq<span class="token punctuation">,</span> c<span class="token operator">=</span><span class="token string">'red'</span><span class="token punctuation">,</span> s<span class="token operator">=</span><span class="token number">40</span><span class="token punctuation">)</span> 
+plt<span class="token punctuation">.</span>scatter<span class="token punctuation">(</span>no_failures_freq<span class="token punctuation">.</span>index<span class="token punctuation">,</span> 
+np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>no_failures_freq<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> c<span class="token operator">=</span><span class="token string">'blue'</span><span class="token punctuation">,</span> s<span class="token operator">=</span><span class="token number">40</span><span class="token punctuation">)</span>  
+plt<span class="token punctuation">.</span>xlabel<span class="token punctuation">(</span><span class="token string">'X: Temperature'</span><span class="token punctuation">)</span>  
+plt<span class="token punctuation">.</span>ylabel<span class="token punctuation">(</span><span class="token string">'Number of Failures'</span><span class="token punctuation">)</span>  
+plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<h3 id="regressão-logística">Regressão logística</h3>
+<p>Agora está tudo pronto para utilizar a regressão logística. Você deverá ter as seguintes bibliotecas instaladas antes de prosseguir:</p>
+<ul>
+<li>Patsy</li>
+<li>Statsmodels</li>
+</ul>
+<p>Depois de instaladas, use o fragmento de código a seguir para treinar o modelo e obter os resultados:</p>
+<pre class=" language-python"><code class="prism  language-python"><span class="token keyword">from</span> patsy <span class="token keyword">import</span> dmatrices
+<span class="token keyword">import</span> statsmodels<span class="token punctuation">.</span>discrete<span class="token punctuation">.</span>discrete_model <span class="token keyword">as</span> sm
+
+<span class="token comment"># obtenha os dados no formato correto</span>
+y<span class="token punctuation">,</span> X <span class="token operator">=</span> dmatrices<span class="token punctuation">(</span><span class="token string">'Y ~ X'</span><span class="token punctuation">,</span> data<span class="token punctuation">,</span> return_type <span class="token operator">=</span> <span class="token string">'dataframe'</span><span class="token punctuation">)</span>
+
+<span class="token comment"># execute o modelo</span>
+logit <span class="token operator">=</span> sm<span class="token punctuation">.</span>Logit<span class="token punctuation">(</span>y<span class="token punctuation">,</span> X<span class="token punctuation">)</span>
+result <span class="token operator">=</span> logit<span class="token punctuation">.</span>fit<span class="token punctuation">(</span><span class="token punctuation">)</span> 
+
+<span class="token comment"># obtenha um resumo dos resultados no modelo</span>
+<span class="token keyword">print</span> result<span class="token punctuation">.</span>summary<span class="token punctuation">(</span><span class="token punctuation">)</span> 
+</code></pre>
+<p>Já com o modelo, os resultados deverão fornecer o coeficiente estimado (coluna <code>coef</code>, fila <code>X</code>), a constante (coluna <code>coef</code>, fila <code>intercept</code>), os erros padrão (<code>std err</code>), os valores-p e os intervalos de confiança de 95%:</p>
+<pre><code>Optimization terminated successfully.
+	Current function value: 0.242411
+	Iterations 7 
+
+                            Logit Regression Results
+============================================================================== 
+Dep. Variable:                       Y   No. Observations:                 120
+Model:                           Logit   Df Residuals:                     118
+Method:                            MLE   Df Model:                           1
+Date:                 Fri, 20 Nov 2020   Pseudo R-squ.:                 0.1549 
+Time:                         17:13:40   Log-Likelihood:               -29.089 
+converged:                        True   LL-Null:                      -34.420 
+Covariance Type:             nonrobust   LLR p-value:                 0.001094
+==============================================================================
+                 coef     std err          z      p&gt;|z|     [0.025      0.975]
+------------------------------------------------------------------------------
+Intercept      7.4049       3.041      2.435      0.015      1.445      13.365 
+X             -0.1466       0.047     -3.104      0.002     -0.239      -0.054
+==============================================================================
+</code></pre>
+<hr>
+<img src="https://drive.google.com/uc?export=view&amp;id=1du2bbjAM4VMziHc2jl9Etk7q26IxuLyy">
+<p>©2021 Massachusetts Institute of Technology</p>
+<!--stackedit_data:&#10;eyJoaXN0b3J5IjpbLTE5NDIxODgyMDgsLTExNzA1NzQ5NzYsLT&#10;g5MTE5NTAwNywtMjA1MjY4MDUxMCwtMTc3NDc3NDU4OSw3MzA5&#10;OTgxMTZdfQ==&#10;-->
+</div>
+</body>
+
+</html>

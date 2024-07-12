@@ -1,0 +1,137 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CE_1.4_por vb</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="estudo-de-caso-1.4">Estudo de caso 1.4</h1>
+<img src="https://drive.google.com/uc?export=view&amp;id=1du2bbjAM4VMziHc2jl9Etk7q26IxuLyy">
+<h2 id="agrupamento-espectral-de-notícias">Agrupamento espectral de notícias</h2>
+<h3 id="instruções-de-execução">Instruções de execução</h3>
+<blockquote>
+<h4 id="google-colab-recomendado">Google Colab (recomendado)</h4>
+<p>Caso queira executar o estudo de caso em Python sem precisar instalar um programa/arquivo em seu computador, faça o que está descrito a seguir:</p>
+<ol>
+<li>Acesse o seguinte <em>notebook</em> do Google Colab: <a href="https://drive.google.com/file/d/1hx_2Gz3PAxtu806npzQuFSLghqKtT_-i/view?usp=sharing">CE_1.4.ipynb</a></li>
+<li>Escolha a opção “Abrir com Google Colaboratory”</li>
+<li>Copie o <em>notebook</em> em seu próprio Google Drive (pode-se executar o código sem realizar esta etapa porém as alterações não ficarão salvas se parte do código for modificado) --&gt; “Copiar no Drive”</li>
+</ol>
+</blockquote>
+<hr>
+<h3 id="compilação-de-artigos-novos">Compilação de artigos novos</h3>
+<p>Para este tutorial, disponibilizamos o código necessário para você obter cerca de 80 artigos de atualidade de um periódico inglês. Fique à vontade para explorar outras fontes de informação se desejar. Você pode extrair o conteúdo de artigos que encontrar na internet (incluindo os títulos) manualmente ou com ferramentas de <em>web scraping</em>, como <a href="https://www.crummy.com/software/BeautifulSoup/bs4/doc/"><code>BeautifulSoup</code></a>.</p>
+<p>Quanto ao restante deste tutorial, entende-se que você tem acesso ao conteúdo de cada um dos artigos no seguinte formato:</p>
+<ul>
+<li>Nome do arquivo: <code>title-&lt;article_number&gt;.txt</code>, exemplo: <code>title-1.txt</code></li>
+<li>Conteúdo: O título da notícia.<br>
+<br></li>
+<li>Nome do arquivo: <code>article-&lt;article_number&gt;.txt</code>, exemplo: <code>article-1.txt</code></li>
+<li>Conteúdo: O título da notícia.<br>
+<br></li>
+<li>Nome do arquivo: <code>topic-&lt;article_number&gt;.txt</code>, exemplo: <code>topic-1.txt</code></li>
+<li>Conteúdo: A seção do periódico de onde foi extraído ou o tema real do qual o artigo trata.</li>
+</ul>
+<p>Quando os dados originais estiverem disponíveis no formato <code>.txt</code> sugerido, você pode executar as linhas de código em Python a seguir e então acessá-las durante o restante do seu roteiro:</p>
+<pre class=" language-python"><code class="prism  language-python"><span class="token comment">#número total de artigos para processar.</span>
+N <span class="token operator">=</span> <span class="token number">100</span>
+
+<span class="token comment">#para armazenar os temas, títulos e conteúdos das noticias:</span>
+topics_array <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+titles_array <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+corpus <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> N<span class="token punctuation">)</span><span class="token punctuation">:</span> 
+	<span class="token comment">#consiga o conteúdo do artigo.</span>
+	<span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span>“article<span class="token operator">-</span>” <span class="token operator">+</span> <span class="token builtin">str</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span> <span class="token operator">+</span> “<span class="token punctuation">.</span>txt”<span class="token punctuation">,</span> <span class="token string">'r'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> myfile<span class="token punctuation">:</span>
+		d1<span class="token operator">=</span>myfile<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">'\n'</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span>  
+		d1 <span class="token operator">=</span> d1<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span>  
+		corpus<span class="token punctuation">.</span>append<span class="token punctuation">(</span>d1<span class="token punctuation">)</span>
+
+	<span class="token comment">#consiga o tema original do artigo.</span>
+	<span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span>“topic<span class="token operator">-</span>” <span class="token operator">+</span> <span class="token builtin">str</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span> <span class="token operator">+</span> “<span class="token punctuation">.</span>txt”<span class="token punctuation">,</span> <span class="token string">'r'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> myfile<span class="token punctuation">:</span>
+        to1<span class="token operator">=</span>myfile<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">'\n'</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span>
+        to1 <span class="token operator">=</span> to1<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        topics_array<span class="token punctuation">.</span>append<span class="token punctuation">(</span>to1<span class="token punctuation">)</span> 
+
+	<span class="token comment">#consiga o título do artigo.</span>
+	<span class="token keyword">with</span> <span class="token builtin">open</span><span class="token punctuation">(</span>“title<span class="token operator">-</span>” <span class="token operator">+</span> <span class="token builtin">str</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span> <span class="token operator">+</span> “<span class="token punctuation">.</span>txt”<span class="token punctuation">,</span> <span class="token string">'r'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> myfile<span class="token punctuation">:</span>
+        ti1<span class="token operator">=</span>myfile<span class="token punctuation">.</span>read<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>replace<span class="token punctuation">(</span><span class="token string">'\n'</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span>
+        ti1 <span class="token operator">=</span> ti1<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        titles_array<span class="token punctuation">.</span>append<span class="token punctuation">(</span>ti1<span class="token punctuation">)</span> 
+</code></pre>
+<h3 id="extração-de-entidades">Extração de entidades</h3>
+<p>Agora, represente o conteúdo de cada artigo (<em>corpus</em>) no modelo “saco de palavras”. Ou seja, procure menções a certas palavras, como nomes de pessoas, organizações, endereços, etc. A lista mestre dessas entidades pode ser encontrada em várias bibliotecas disponíveis publicamente. Uma dessas bibliotecas baseadas em Python se chama <a href="https://github.com/mit-nlp/MITIE">MITIE</a>.</p>
+<p>O MITIE fornece vários modelos de entidade por padrão. Serão usadas as entidades do modelo <code>NER</code>.</p>
+<p>Agora você está pronto para:</p>
+<ol>
+<li>
+<p>Vincular todos os <em>corpus</em> de texto de artigos para determinar todas as palavras únicas que são usadas no conjunto de dados.</p>
+</li>
+<li>
+<p>Encontrar o subconjunto das entidades do modelo <code>NER</code> que está entre as palavras únicas que são utilizadas no conjunto de dados (determinado na etapa 1).</p>
+</li>
+</ol>
+<p>Este objetivo é alcançado através das seguintes linhas de código:</p>
+<pre class=" language-python"><code class="prism  language-python"><span class="token comment">#vetor de subconjunto de entidades</span>
+entity_text_array <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span> 
+<span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> N<span class="token punctuation">)</span><span class="token punctuation">:</span> 
+	<span class="token comment">#carregue o arquivo de texto com o conteúdo do artigo e converta em uma lista de palavras</span>
+	tokens <span class="token operator">=</span> tokenize<span class="token punctuation">(</span>load_entire_file<span class="token punctuation">(</span><span class="token punctuation">(</span>“article<span class="token operator">-</span>” <span class="token operator">+</span> <span class="token builtin">str</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span> <span class="token operator">+</span> “<span class="token punctuation">.</span>txt”<span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token comment">#extraia todas as entidades conhecidas do modelo NER mencionado neste artigo.</span>
+	entities <span class="token operator">=</span> ner<span class="token punctuation">.</span>extract_entities<span class="token punctuation">(</span>tokens<span class="token punctuation">)</span> 
+	<span class="token comment">#extraia as palabras das entidades reais e agregue ao vetor.</span>
+	<span class="token keyword">for</span> e <span class="token keyword">in</span> entities<span class="token punctuation">:</span> 
+		range_array <span class="token operator">=</span> e<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> 
+		tag <span class="token operator">=</span> e<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> 
+		score <span class="token operator">=</span> e<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span>
+		score_text <span class="token operator">=</span> <span class="token string">"{:0.3f}"</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">(</span>score<span class="token punctuation">)</span> 
+		entity_text <span class="token operator">=</span> <span class="token string">" "</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>tokens<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token keyword">for</span> j <span class="token keyword">in</span> range_array<span class="token punctuation">)</span> 
+		entity_ text_array<span class="token punctuation">.</span>append<span class="token punctuation">(</span>entity_text<span class="token punctuation">.</span>lower<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token comment">#elimine as entidades duplicadas foram detectadas.</span>
+entity_text_array <span class="token operator">=</span> <span class="token builtin">list</span><span class="token punctuation">(</span><span class="token builtin">set</span><span class="token punctuation">(</span>entity_text_array<span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<h3 id="tf-idf"><em>TF-IDF</em></h3>
+<p>Agora que já tem a lista de todas as entidades utilizadas em seu conjunto de dados, você pode representar cada artigo como um vetor que contém a pontuação de <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf"><em>TF-IDF</em></a> para cada entidade armazenada no <code>entity_text_array</code>.  Esta tarefa pode ser realizada facilmente com a biblioteca <a href="http://scikit-learn.org/stable/"><code>scikit-learn</code></a> para Python. As seguintes linhas de código irão ajudá-lo a representar cada artigo no conjunto de dados como um vetor dos valores <em>TF-IDF</em>:</p>
+<pre class=" language-python"><code class="prism  language-python"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>feature_extraction<span class="token punctuation">.</span>text <span class="token keyword">import</span> TfidfVectorizer
+
+vect <span class="token operator">=</span> TfidfVectorizer<span class="token punctuation">(</span>sublinear_tf<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>
+					   max_df<span class="token operator">=</span><span class="token number">0.5</span><span class="token punctuation">,</span> 
+					   analyzer<span class="token operator">=</span><span class="token string">'word'</span><span class="token punctuation">,</span> 
+					   stop_words<span class="token operator">=</span><span class="token string">'english'</span><span class="token punctuation">,</span> 
+					   vocabulary<span class="token operator">=</span>entity_text_array<span class="token punctuation">)</span>
+corpus_tf_idf <span class="token operator">=</span> vect<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>corpus<span class="token punctuation">)</span>
+</code></pre>
+<h3 id="agrupamento-espectral">Agrupamento espectral</h3>
+<p>Com os artigos representados como vetores de suas pontuações de <em>TF-IDF</em>, você está pronto para fazer o agrupamento espectral dos artigos. Para isso, você pode utilizar a biblioteca scikit-learn. As seguintes linhas de código irão agrupar seus artigos em <span class="katex--inline"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault" style="margin-right: 0.10903em;">N</span></span></span></span></span> grupos. Utilize a quantidade de agrupamentos que melhor se ajusta às suas necessidades:</p>
+<pre class=" language-python"><code class="prism  language-python"><span class="token keyword">from</span> sklearn <span class="token keyword">import</span> cluster 
+
+<span class="token comment">#Ajuste n_clusters ao número de clusters desejados  </span>
+n_clusters <span class="token operator">=</span> <span class="token number">8</span>
+<span class="token comment">#Agrupamento espectral </span>
+spectral <span class="token operator">=</span> cluster<span class="token punctuation">.</span>SpectralClustering<span class="token punctuation">(</span>n_clusters<span class="token operator">=</span> n_clusters<span class="token punctuation">,</span>
+									  eigen_solver<span class="token operator">=</span><span class="token string">'arpack'</span><span class="token punctuation">,</span>
+									  affinity<span class="token operator">=</span><span class="token string">"nearest_neighbors"</span><span class="token punctuation">,</span>
+									  n_neighbors <span class="token operator">=</span> <span class="token number">10</span><span class="token punctuation">)</span>
+spectral<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>corpus_tf_idf<span class="token punctuation">)</span> 
+</code></pre>
+<h3 id="resultado">Resultado</h3>
+<p>Agora que tem o modelo de agrupamento espectral ajustado ao conjunto de dados, as linhas de código a seguir o ajudarão a ver o resultado no seguinte formato (uma linha por artigo):</p>
+<p><code>article_number, topic, spectral_clustering_cluster_number, article_title</code></p>
+<pre class=" language-python"><code class="prism  language-python"><span class="token keyword">if</span> <span class="token builtin">hasattr</span><span class="token punctuation">(</span>spectral<span class="token punctuation">,</span> <span class="token string">'labels_'</span><span class="token punctuation">)</span><span class="token punctuation">:</span>  
+	cluster_assignments <span class="token operator">=</span> spectral<span class="token punctuation">.</span>labels_<span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span><span class="token builtin">int</span><span class="token punctuation">)</span>
+	<span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token builtin">len</span><span class="token punctuation">(</span>cluster_assignments<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>  
+		<span class="token keyword">print</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> topics_array<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> cluster_assignments <span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> titles_array<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span>
+</code></pre>
+<hr>
+<img src="https://drive.google.com/uc?export=view&amp;id=1du2bbjAM4VMziHc2jl9Etk7q26IxuLyy">
+<p>©2021 Massachusetts Institute of Technology</p>
+<!--stackedit_data:&#10;eyJoaXN0b3J5IjpbLTE1MDQ5MDQxOTMsOTcyOTk3NTM3LC03NT&#10;g1MTAwMjIsMTEwNzI3ODMxMCw3OTMxNzYxMjgsLTE5MTQ3NDAy&#10;MTIsMTEzNjA3MTM2NywtMTMzNzYyNjM3OCw3MzA5OTgxMTZdfQ&#10;-->
+</div>
+</body>
+
+</html>

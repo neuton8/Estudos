@@ -1,0 +1,172 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CE_2.2_ por vb</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="estudo-de-caso-2.2">Estudo de caso 2.2</h1>
+<img src="https://drive.google.com/uc?export=view&amp;id=1du2bbjAM4VMziHc2jl9Etk7q26IxuLyy">
+<h2 id="diferença-salarial-entre-homens-e-mulheres">Diferença salarial entre homens e mulheres</h2>
+<h3 id="instruções-de-execução">Instruções de execução</h3>
+<blockquote>
+<h4 id="google-colab-recomendado">Google Colab (recomendado)</h4>
+<p>Caso queira executar o estudo de caso em Python sem precisar instalar um programa/arquivo em seu computador, faça o que está descrito a seguir:</p>
+<ol>
+<li>Acesse o seguinte <em>notebook</em> do Google Colab: <a href="https://drive.google.com/file/d/17VAp5hns4MSVaptpvacTJW-SV7KgUnKP/view?usp=sharing">CE_2.2.ipynb</a></li>
+<li>Escolha a opção “Abrir com Google Colaboratory”</li>
+<li>Copie o <em>notebook</em> em seu próprio Google Drive (pode-se executar o código sem realizar esta etapa porém as alterações não ficarão salvas se parte do código for modificado) --&gt; “Copiar no Drive”</li>
+</ol>
+</blockquote>
+<blockquote>
+<h4 id="rstudio">RStudio</h4>
+<p>Acesse os arquivos originais do estudo de caso na pasta: <a href="https://drive.google.com/drive/folders/1q-uUSZ-3vPy-SGVP-yqtC5lu1y_DbRtZ?usp=sharing">m2/CE_2.2/R_files</a>.<br>
+Depois de baixar os arquivos, execute-os com o programa <a href="https://rstudio.com/">RStudio</a>.</p>
+</blockquote>
+<h3 id="introdução">Introdução</h3>
+<p>Neste estudo, consideraremos o caso da diferença salarial entre homens e mulheres nos Estados Unidos.</p>
+<p>Vamos relembrar a pergunta de inferência:</p>
+<blockquote>
+<p>Qual é a diferença na previsão do salário entre homens e mulheres que possuem as mesmas características laborais?</p>
+</blockquote>
+<h3 id="dados">Dados</h3>
+<p>Novamente, utilizaremos o banco de dados da Pesquisa da Força de Trabalho dos Estados Unidos de 2012. A tabela a seguir mostra os valores médios de algumas das características contempladas pelo banco de dados, separadas por gênero.</p>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="right"><strong>média homens</strong></th>
+<th align="right"><strong>média mulheres</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cg</code> (ensino superior completo)</td>
+<td align="right">0.35</td>
+<td align="right">0.41</td>
+</tr>
+<tr>
+<td><code>sc</code> (ensino superior incompleto)</td>
+<td align="right">0.30</td>
+<td align="right">0.35</td>
+</tr>
+<tr>
+<td><code>hsg</code>(ensino médio)</td>
+<td align="right">0.34</td>
+<td align="right">0.24</td>
+</tr>
+<tr>
+<td><code>mw</code> (centro-oeste)</td>
+<td align="right">0.28</td>
+<td align="right">0.29</td>
+</tr>
+<tr>
+<td><code>so</code> (sul)</td>
+<td align="right">0.24</td>
+<td align="right">0.26</td>
+</tr>
+<tr>
+<td><code>we</code> (oeste)</td>
+<td align="right">0.22</td>
+<td align="right">0.20</td>
+</tr>
+<tr>
+<td><code>ne</code> (nordeste)</td>
+<td align="right">0.26</td>
+<td align="right">0.26</td>
+</tr>
+<tr>
+<td><code>exp1</code> (experiência)</td>
+<td align="right">13.58</td>
+<td align="right">13.04</td>
+</tr>
+<tr>
+<td><code>exp2</code> (experiência<sup>2</sup>/100)</td>
+<td align="right">2.59</td>
+<td align="right">2.45</td>
+</tr>
+<tr>
+<td><code>exp3</code> (experiência<sup>3</sup>/1000)</td>
+<td align="right">5.96</td>
+<td align="right">5.60</td>
+</tr>
+<tr>
+<td><code>wage</code> (salário)</td>
+<td align="right">16.12</td>
+<td align="right">14.72</td>
+</tr>
+</tbody>
+</table><p>Como podemos observar, o salário médio é de 16 $/h para os homens e de aproximadamente 15 $/h para as mulheres, o que dá uma diferença de 1  $, sem controlar por características relacionadas com o emprego.</p>
+<p>Se analisarmos algumas dessas características, observaremos que, em média, os homens têm mais experiência de trabalho, porém as mulheres têm mais chance de ter concluído o ensino superior ou de ter frequentado a universidade por algum tempo. A distribuição geográfica de homens e mulheres é semelhante.</p>
+<h3 id="especificações">Especificações</h3>
+<p>Em seguida, passamos a estimar o seguinte modelo de regressão linear:</p>
+<p><span class="katex--display"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>Y</mi><mo>=</mo><msub><mi>β</mi><mn>1</mn></msub><mi>D</mi><mo>+</mo><msubsup><mi>β</mi><mn>2</mn><mo mathvariant="normal">′</mo></msubsup><mi>W</mi><mo>+</mo><mi>ϵ</mi></mrow><annotation encoding="application/x-tex">
+Y = \beta_1D+\beta_2'W+\epsilon
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault" style="margin-right: 0.22222em;">Y</span><span class="mspace" style="margin-right: 0.277778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right: 0.277778em;"></span></span><span class="base"><span class="strut" style="height: 0.88888em; vertical-align: -0.19444em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right: 0.05278em;">β</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.301108em;"><span class="" style="top: -2.55em; margin-left: -0.05278em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.15em;"><span class=""></span></span></span></span></span></span><span class="mord mathdefault" style="margin-right: 0.02778em;">D</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 1.04889em; vertical-align: -0.247em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right: 0.05278em;">β</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.801892em;"><span class="" style="top: -2.453em; margin-left: -0.05278em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span><span class="" style="top: -3.113em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.247em;"><span class=""></span></span></span></span></span></span><span class="mord mathdefault" style="margin-right: 0.13889em;">W</span><span class="mspace" style="margin-right: 0.222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right: 0.222222em;"></span></span><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord mathdefault">ϵ</span></span></span></span></span></span></p>
+<p>onde <span class="katex--inline"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault" style="margin-right: 0.02778em;">D</span></span></span></span></span> é o indicador de “mulher” (1 para mulher e 0 para homem) e os controles <span class="katex--inline"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault" style="margin-right: 0.13889em;">W</span></span></span></span></span> são as características relacionadas com o emprego. Assim como no Estudo de Caso 2.1, construiremos dois modelos lineares diferentes, tendo como diferença entre os dois o número de controles:</p>
+<p><strong>Modelo básico</strong>: <span class="katex--inline"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault" style="margin-right: 0.13889em;">W</span></span></span></span></span> é composto pelos indicadores de educação e região de origem, experiência de trabalho, experiência de trabalho ao quadrado e experiência de trabalho ao cubo.</p>
+<p><strong>Modelo flexível</strong>: <span class="katex--inline"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.68333em; vertical-align: 0em;"></span><span class="mord mathdefault" style="margin-right: 0.13889em;">W</span></span></span></span></span> são os controles do modelo básico, junto com todas suas interações de segundo grau.</p>
+<h3 id="resultados">Resultados</h3>
+<p>Na tabela a seguir, vemos os resultados do estudo: o coeficiente de regressão estimado, <span class="katex--inline"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mover accent="true"><mi>β</mi><mo>^</mo></mover><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">\hat{\beta}_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 1.15232em; vertical-align: -0.19444em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.95788em;"><span class="" style="top: -3em;"><span class="pstrut" style="height: 3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right: 0.05278em;">β</span></span></span><span class="" style="top: -3.26344em;"><span class="pstrut" style="height: 3em;"></span><span class="accent-body" style="left: -0.16666em;">^</span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.19444em;"><span class=""></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.301108em;"><span class="" style="top: -2.55em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.15em;"><span class=""></span></span></span></span></span></span></span></span></span></span>, seu erro padrão , <span class="katex--inline"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msqrt><mrow><mover accent="true"><mi>V</mi><mo>^</mo></mover><mi mathvariant="normal">/</mi><mi>n</mi></mrow></msqrt></mrow><annotation encoding="application/x-tex">\sqrt{\hat{V}/n}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 1.84em; vertical-align: -0.506615em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 1.33339em;"><span class="svg-align" style="top: -3.8em;"><span class="pstrut" style="height: 3.8em;"></span><span class="mord" style="padding-left: 1em;"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height: 0.94677em;"><span class="" style="top: -3em;"><span class="pstrut" style="height: 3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right: 0.22222em;">V</span></span></span><span class="" style="top: -3.25233em;"><span class="pstrut" style="height: 3em;"></span><span class="accent-body" style="left: -0.25em;">^</span></span></span></span></span></span><span class="mord">/</span><span class="mord mathdefault">n</span></span></span><span class="" style="top: -3.29338em;"><span class="pstrut" style="height: 3.8em;"></span><span class="hide-tail" style="min-width: 1.02em; height: 1.88em;"><svg width="400em" height="1.8800000000000001em" viewBox="0 0 400000 1944" preserveAspectRatio="xMinYMin slice"><path d="M1001,80H400000v40H1013.1s-83.4,268,-264.1,840c-180.7,
+572,-277,876.3,-289,913c-4.7,4.7,-12.7,7,-24,7s-12,0,-12,0c-1.3,-3.3,-3.7,-11.7,
+-7,-25c-35.3,-125.3,-106.7,-373.3,-214,-744c-10,12,-21,25,-33,39s-32,39,-32,39
+c-6,-5.3,-15,-14,-27,-26s25,-30,25,-30c26.7,-32.7,52,-63,76,-91s52,-60,52,-60
+s208,722,208,722c56,-175.3,126.3,-397.3,211,-666c84.7,-268.7,153.8,-488.2,207.5,
+-658.5c53.7,-170.3,84.5,-266.8,92.5,-289.5c4,-6.7,10,-10,18,-10z
+M1001 80H400000v40H1013z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.506615em;"><span class=""></span></span></span></span></span></span></span></span></span> e seu intervalo de confiança de 95%, tanto para o modelo de regressão básico como para o flexível:</p>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="center">Estimativa <span class="katex--inline"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo fence="true">(</mo><msub><mover accent="true"><mi>β</mi><mo>^</mo></mover><mn>1</mn></msub><mo fence="true">)</mo></mrow><annotation encoding="application/x-tex">\left(\hat{\beta}_1\right)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 1.80002em; vertical-align: -0.65002em;"></span><span class="minner"><span class="mopen delimcenter" style="top: 0em;"><span class="delimsizing size2">(</span></span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.95788em;"><span class="" style="top: -3em;"><span class="pstrut" style="height: 3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right: 0.05278em;">β</span></span></span><span class="" style="top: -3.26344em;"><span class="pstrut" style="height: 3em;"></span><span class="accent-body" style="left: -0.16666em;">^</span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.19444em;"><span class=""></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.301108em;"><span class="" style="top: -2.55em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.15em;"><span class=""></span></span></span></span></span></span><span class="mclose delimcenter" style="top: 0em;"><span class="delimsizing size2">)</span></span></span></span></span></span></span></th>
+<th align="center">Erro padrão <span class="katex--inline"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo fence="true">(</mo><msqrt><mrow><mover accent="true"><mi>V</mi><mo>^</mo></mover><mi mathvariant="normal">/</mi><mi>n</mi></mrow></msqrt><mo fence="true">)</mo></mrow><annotation encoding="application/x-tex">\left(\sqrt{\hat{V}/n}\right)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 2.40003em; vertical-align: -0.95003em;"></span><span class="minner"><span class="mopen delimcenter" style="top: 0em;"><span class="delimsizing size3">(</span></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 1.33339em;"><span class="svg-align" style="top: -3.8em;"><span class="pstrut" style="height: 3.8em;"></span><span class="mord" style="padding-left: 1em;"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height: 0.94677em;"><span class="" style="top: -3em;"><span class="pstrut" style="height: 3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right: 0.22222em;">V</span></span></span><span class="" style="top: -3.25233em;"><span class="pstrut" style="height: 3em;"></span><span class="accent-body" style="left: -0.25em;">^</span></span></span></span></span></span><span class="mord">/</span><span class="mord mathdefault">n</span></span></span><span class="" style="top: -3.29338em;"><span class="pstrut" style="height: 3.8em;"></span><span class="hide-tail" style="min-width: 1.02em; height: 1.88em;"><svg width="400em" height="1.8800000000000001em" viewBox="0 0 400000 1944" preserveAspectRatio="xMinYMin slice"><path d="M1001,80H400000v40H1013.1s-83.4,268,-264.1,840c-180.7,
+572,-277,876.3,-289,913c-4.7,4.7,-12.7,7,-24,7s-12,0,-12,0c-1.3,-3.3,-3.7,-11.7,
+-7,-25c-35.3,-125.3,-106.7,-373.3,-214,-744c-10,12,-21,25,-33,39s-32,39,-32,39
+c-6,-5.3,-15,-14,-27,-26s25,-30,25,-30c26.7,-32.7,52,-63,76,-91s52,-60,52,-60
+s208,722,208,722c56,-175.3,126.3,-397.3,211,-666c84.7,-268.7,153.8,-488.2,207.5,
+-658.5c53.7,-170.3,84.5,-266.8,92.5,-289.5c4,-6.7,10,-10,18,-10z
+M1001 80H400000v40H1013z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.506615em;"><span class=""></span></span></span></span></span><span class="mclose delimcenter" style="top: 0em;"><span class="delimsizing size3">)</span></span></span></span></span></span></span></th>
+<th align="center">Intervalo de confiança 95%</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Regressão básica</td>
+<td align="center">-1.83</td>
+<td align="center">0.42</td>
+<td align="center">[-2.66 , -0.99]</td>
+</tr>
+<tr>
+<td>Regressão flexível</td>
+<td align="center">-1.88</td>
+<td align="center">0.42</td>
+<td align="center">[-2.71 , -1.05]</td>
+</tr>
+</tbody>
+</table><p>Os resultados dos modelos de regressão básico e flexível são muito semelhantes.</p>
+<p>A diferença salarial estimada entre homens e mulheres é de cerca de -2 $/h. Isso significa que as mulheres recebem 2 $/h menos em média do que os homens, se controlamos por fatores de experiência de trabalho, educacionais e geográficos.</p>
+<p>O intervalo de confiança de 95% cobre a faixa entre -2.7 $/h e -1 $/h, ou seja, o coeficiente de regressão real ou coeficiente de regressão populacional está dentro desse intervalo com uma probabilidade de 95%. Desta forma, concluímos que a diferença salarial entre homens e mulheres, com iguais características laborais relevantes, é estatística e economicamente significativa.</p>
+<h3 id="conclusões">Conclusões</h3>
+<p>Foi aplicada a teoria aprendida no estudo da diferença salarial entre homens e mulheres, chegando às seguintes conclusões:</p>
+<ul>
+<li>
+<p>A diferença salarial entre homens e mulheres pode revelar a existência de <strong>discriminação</strong> contra as mulheres no mercado de trabalho.</p>
+</li>
+<li>
+<p>A diferença salarial entre homens e mulheres também pode refletir um certo <strong>efeito de seleção</strong>, ou seja, as mulheres têm maior probabilidade de aceitar empregos de menor remuneração (como os relacionados à educação escolar).</p>
+</li>
+</ul>
+<hr>
+<img src="https://drive.google.com/uc?export=view&amp;id=1du2bbjAM4VMziHc2jl9Etk7q26IxuLyy">
+<p>©2021 Massachusetts Institute of Technology</p>
+<!--stackedit_data:&#10;eyJoaXN0b3J5IjpbLTgwODkzMDcsLTE4NzM4NzI1MTEsMTU3MD&#10;g4MDg2OSw0NTQ4MDc3NjQsNzMwOTk4MTE2XX0=&#10;-->
+</div>
+</body>
+
+</html>

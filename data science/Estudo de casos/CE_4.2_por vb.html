@@ -1,0 +1,240 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CE_4.2_por vb</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="estudo-de-caso-4.2">Estudo de caso 4.2</h1>
+<img src="https://drive.google.com/uc?export=view&amp;id=1du2bbjAM4VMziHc2jl9Etk7q26IxuLyy">
+<h2 id="sistema-de-recomendação-de-músicas">Sistema de recomendação de músicas</h2>
+<h3 id="instruções-de-execução">Instruções de execução</h3>
+<blockquote>
+<p>Para este estudo de caso <strong>não será fornecido nenhum código</strong>. Tente implementar suas soluções do zero!</p>
+<p>Em caso de dúvidas, entre em contato com seu Facilitador ou compartilhe-as com seus colegas no Slack.</p>
+<p>Disponibilizamos a você um <em>notebook</em> do Google Colab em branco para realizar o estudo. Relembramos aqui as instruções para executá-lo:</p>
+<ol>
+<li>Acesse o seguinte <em>notebook</em> do Google Colab: <a href="https://drive.google.com/file/d/10S8cdVQIMLH7n37um1aXbIMs05HXTmy_/view?usp=sharing">CE_4.2.ipynb</a></li>
+<li>Selecione a opção “Abrir com Google Colaboratory”</li>
+<li>Copie o <em>notebook</em> em seu próprio Google Drive (pode-se executar o código sem realizar esta etapa porém as alterações não ficarão salvas se parte do código for modificada) --&gt; “Copiar no Drive”</li>
+</ol>
+</blockquote>
+<hr>
+<h3 id="introdução">Introdução</h3>
+<h4 id="problema-recomendar-novas-músicas-de-acordo-com-os-hábitos-do-usuário-como-no-spotify-por-exemplo">Problema: Recomendar novas músicas de acordo com os hábitos do usuário (como no Spotify, por exemplo)</h4>
+<ol>
+<li>Subconjunto de aproximadamente 10.000 músicas</li>
+<li>Pontuações 0/1: ouvida/não ouvida</li>
+<li>Esparsidade (<em>sparsity</em>)  de mais de 99% (apenas um 1% de entradas disponíveis)</li>
+</ol>
+<h3 id="dados">Dados</h3>
+<p>Neste estudo de caso, usaremos o banco de dados <a href="http://labrosa.ee.columbia.edu/millionsong/"><em>Million Song Dataset</em></a>:</p>
+<ul>
+<li>
+<p>O <em>Million Song Dataset</em> contém vários conjuntos de dados. Escolha o que você quiser. Para este exemplo, utilizaremos o <a href="https://www.kaggle.com/anuragbanerjee/million-song-data-set-subset">conjunto de dados de 10k músicas</a></p>
+</li>
+<li>
+<p>Salve este arquivo com o nome: <code>songs.txt</code> (Em seu navegador --&gt; Salvar como… --&gt; Texto).</p>
+</li>
+<li>
+<p>Este conjunto de dados consiste em:</p>
+<ul>
+<li>
+<p>10.000 músicas</p>
+</li>
+<li>
+<p>O arquivo possui as seguintes colunas separadas por <em>tabs</em>:<br>
+<code>user_id | song_id | listen_count</code></p>
+</li>
+<li>
+<p><a href="https://www.kaggle.com/anuragbanerjee/million-song-data-set-subset?select=song_data.csv">metadados adicionais</a> disponíveis das músicas</p>
+<ul>
+<li>
+<p>Este arquivo contém as seguintes colunas:<br>
+<code>song_id | title | release | artist_name | year</code></p>
+</li>
+<li>
+<p>Salve este arquivo como <code>song_metadata.csv</code>.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="leituravisualização-do-conjunto-de-dados">Leitura/Visualização do conjunto de dados</h4>
+<ul>
+<li>
+<p>A primeira tarefa é explorar o conjunto de dados. Para isso, você pode usar a linguagem de programação de sua escolha, tanto Python como R.</p>
+</li>
+<li>
+<p>Em <strong>R</strong>, faça o seguinte:</p>
+<ul>
+<li>Leia os dados com a função <code>read.table()</code>:<pre class=" language-r"><code class="prism  language-r">data <span class="token operator">=</span> read.table<span class="token punctuation">(</span><span class="token string">'songs.txt'</span><span class="token punctuation">)</span> 
+</code></pre>
+</li>
+<li>Escolha outro nome para as colunas:<pre class=" language-r"><code class="prism  language-r">colnames<span class="token punctuation">(</span>data<span class="token punctuation">)</span> <span class="token operator">=</span> c<span class="token punctuation">(</span><span class="token string">"user_id"</span><span class="token punctuation">,</span> <span class="token string">"song_id"</span><span class="token punctuation">,</span> <span class="token string">"listen_count"</span><span class="token punctuation">)</span>
+</code></pre>
+</li>
+<li>Como não necessitamos do valor <code>listen_count</code>, deduzimos que:<pre class=" language-r"><code class="prism  language-r">data <span class="token operator">=</span> data<span class="token punctuation">[</span> <span class="token punctuation">,</span> <span class="token operator">-</span>which<span class="token punctuation">(</span>names<span class="token punctuation">(</span>data<span class="token punctuation">)</span> <span class="token percent-operator operator">%in%</span> c<span class="token punctuation">(</span><span class="token string">"listen_count"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+</code></pre>
+</li>
+<li>Além disso, caso queira associar os nomes das músicas às identificações, você pode ler os metadados das músicas primeiro e mesclar os dois conjuntos de dados:<pre class=" language-r"><code class="prism  language-r">song_metadata <span class="token operator">=</span> read.csv<span class="token punctuation">(</span><span class="token string">"song_metadata.csv"</span><span class="token punctuation">)</span>
+data <span class="token operator">=</span> merge<span class="token punctuation">(</span>data<span class="token punctuation">,</span> song_metadata<span class="token punctuation">,</span> by<span class="token operator">=</span><span class="token string">"song_id"</span><span class="token punctuation">)</span> 
+data <span class="token operator">=</span> droplevels<span class="token punctuation">(</span>data<span class="token punctuation">)</span>
+</code></pre>
+</li>
+<li>Finalmente, visualize as propriedades dos dados com:<pre class=" language-r"><code class="prism  language-r">str<span class="token punctuation">(</span>data<span class="token punctuation">)</span>
+summary<span class="token punctuation">(</span>data<span class="token punctuation">)</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>Em <strong>Python</strong>, pode-se converter os dados a um <em>dataframe</em> da <a href="http://pandas.pydata.org/"><code>pandas</code></a> para organizá-los e mesclá-los com os metadados.</p>
+</li>
+<li>
+<p>A <strong>esparsidade</strong> do conjunto de dados pode ser calculada da seguinte forma:</p>
+</li>
+</ul>
+<blockquote>
+<p>esparsidade = nº de linhas no banco de dados / (nº músicas × nº de usuários) × 100%</p>
+</blockquote>
+<h4 id="criação-de-subconjuntos-de-dados">Criação de subconjuntos de dados</h4>
+<ul>
+<li>
+<p>Caso queira que os dados fiquem menos esparsos, uma boa maneira de fazer isso é criando um subconjunto onde existam apenas usuários/músicas que tenham pelo menos um certo número de observações no conjunto de dados.</p>
+</li>
+<li>
+<p>Por exemplo, em <strong>R</strong>, caso você quisesse criar um subconjunto de dados contendo apenas usuários com 50 ou mais classificações, teria que fazer o seguinte:</p>
+<pre class=" language-r"><code class="prism  language-r">data <span class="token operator">=</span> data<span class="token punctuation">[</span>data<span class="token operator">$</span>user_id <span class="token percent-operator operator">%in%</span> names<span class="token punctuation">(</span>table<span class="token punctuation">(</span>data<span class="token operator">$</span>user_id<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">[</span>table<span class="token punctuation">(</span>data<span class="token operator">$</span>user_id<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">50</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token punctuation">]</span>
+</code></pre>
+</li>
+</ul>
+<h3 id="sistemas-de-recomendação">Sistemas de recomendação</h3>
+<ul>
+<li>
+<p>Caso queira criar seu próprio sistema de recomendação do zero, você pode consultar uma grande quantidade de literatura acadêmica disponível para uso gratuito. Existem também vários guias que podem ser úteis, como:</p>
+<ul>
+<li><a href="http://www.salemmarafi.com/code/collaborative-filtering-r/">http://www.salemmarafi.com/code/collaborative-filtering-r/</a> ,</li>
+<li><a href="https://blogs.gartner.com/martin-kihn/how-to-build-a-recommender-system-in-python/">https://blogs.gartner.com/martin-kihn/how-to-build-a-recommender-system-in-python/</a></li>
+</ul>
+</li>
+<li>
+<p>No entanto, por quê construir um sistema de recomendação do zero quando existe uma ampla gama de sistemas de recomendação públicos que estão disponíveis em todos os tipos de ambientes de programação e prontos para uso? Exemplos:</p>
+<ul>
+<li>
+<p><a href="https://cran.r-project.org/web/packages/recommenderlab/vignettes/recommenderlab.pdf">RecommenderLab</a> em R</p>
+</li>
+<li>
+<p><a href="https://apple.github.io/turicreate/docs/api/">Turi-Create</a> para Python</p>
+</li>
+<li>
+<p><a href="http://surpriselib.com/">Suprise</a> para Python</p>
+</li>
+<li>
+<p><a href="https://spark.apache.org/docs/1.4.0/api/python/pyspark.mllib.html#modulepyspark.mllib.recommendation">Módulo de recomendação</a> de Apache Spark</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="separação-aleatória-de-dados-conjuntos-de-treinamentoteste">Separação aleatória de dados (conjuntos de treinamento/teste)</h3>
+<p>Existem diferentes maneiras de fazer uma separação aleatória do banco de dados.</p>
+<ul>
+<li>
+<p>Em <strong>R</strong>, execute o código a seguir para fazer uma separação 70/30 para treinamento/teste:</p>
+<pre class=" language-r"><code class="prism  language-r">spl <span class="token operator">=</span> sample.split<span class="token punctuation">(</span>data<span class="token operator">$</span>rating<span class="token punctuation">,</span> <span class="token number">0.7</span><span class="token punctuation">)</span>  
+train <span class="token operator">=</span> subset<span class="token punctuation">(</span>data<span class="token punctuation">,</span> spl <span class="token operator">==</span> <span class="token boolean">TRUE</span><span class="token punctuation">)</span>
+test <span class="token operator">=</span> subset<span class="token punctuation">(</span>data<span class="token punctuation">,</span> spl <span class="token operator">==</span> <span class="token boolean">FALSE</span><span class="token punctuation">)</span> 
+</code></pre>
+</li>
+<li>
+<p>Em <strong>Python</strong>, você pode usar <code>pandas</code> junto com a biblioteca <em>SciKit-Learn</em> (<code>sklearn</code>):</p>
+<pre class=" language-python"><code class="prism  language-python"><span class="token keyword">import</span> pandas <span class="token keyword">as</span> pd  
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np  
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>cross_validation <span class="token keyword">import</span> train_test_split 
+
+<span class="token comment">#assumindo que "pdf" é nosso dataframe com os dados</span>
+train<span class="token punctuation">,</span>test <span class="token operator">=</span> train_test_split<span class="token punctuation">(</span>pdf<span class="token punctuation">,</span> test_size <span class="token operator">=</span> <span class="token number">0.3</span><span class="token punctuation">)</span>
+</code></pre>
+</li>
+<li>
+<p>Você também pode usar as bibliotecas de sistemas de recomendação mencionadas anteriormente para fazer uma separação de dados.</p>
+<ul>
+<li>Para <strong>RecommenderLab</strong> em R, a documentação da <a href="https://cran.r-project.org/web/packages/recommenderlab/vignettes/recommenderlab.pdf">seção 5.6</a> fornece exemplos para separar dados de forma aleatória</li>
+<li>A classe <code>SFrame</code> de <strong>Turi</strong>, também conta com uma função <a href="https://apple.github.io/turicreate/docs/api/generated/turicreate.SFrame.random_split.html#turicreate.SFrame.random_split"><code>random_split</code></a> que funciona de maneira similar</li>
+</ul>
+</li>
+</ul>
+<h3 id="sistema-de-recomendação-baseado-na-popularidade">Sistema de recomendação baseado na popularidade</h3>
+<ul>
+<li>
+<p>O <strong>RecommenderLab</strong> em R, por exemplo, fornece um sistema de recomendação baseado na popularidade e fácil de usar. A <a href="https://cran.r-project.org/web/packages/recommenderlab/vignettes/recommenderlab.pdf">seção 5.5</a> do guia do RecommenderLab contém exemplos e códigos de amostra para fazer isso.</p>
+</li>
+<li>
+<p>O <strong>Turi-Create</strong> também fornece um sistema de recomendação baseado na popularidade em Python. Se o conjunto de dados estiver no <code>pandas</code>, ele pode ser integrado com a classe <code>SFrame</code> do Turi, conforme mostrado na <a href="https://apple.github.io/turicreate/docs/api/generated/turicreate.SFrame.html">documentação</a> da biblioteca. Você poderá encontrar mais informações sobre o sistema de recomendação baseado na popularidade e seu uso na documentação da classe <a href="https://apple.github.io/turicreate/docs/api/generated/turicreate.recommender.popularity_recommender.PopularityRecommender.html#turicreate.recommender.popularity_recommender.PopularityRecommender">PopularityRecommender</a> da biblioteca.</p>
+</li>
+</ul>
+<h3 id="filtragem-por-similaridade-de-itens">Filtragem por similaridade de itens</h3>
+<ul>
+<li>
+<p>As bibliotecas dos sistemas de recomendação também fornecem métodos baseados na similaridade de itens.</p>
+<ul>
+<li>
+<p>No <strong>RecommenderLab</strong>, utilize a filtragem colaborativa baseada em itens (<em>Item-based colaborative filtering, IBCF</em>) para treinar o modelo.</p>
+</li>
+<li>
+<p>No <strong>Turi</strong>, utilize o modelo <a href="https://apple.github.io/turicreate/docs/api/generated/turicreate.recommender.item_similarity_recommender.ItemSimilarityRecommender.html#turicreate.recommender.item_similarity_recommender.ItemSimilarityRecommender">ItemSimilarityRecommender</a></p>
+</li>
+</ul>
+</li>
+</ul>
+<p>Conforme visto na parte teórica do módulo, os sistemas de filtragem baseada na similaridade do item possuem as seguintes características:</p>
+<ul>
+<li>Os sistemas de recomendação de similaridade de itens podem usar o modelo de avaliação “0/1” para treinar os algoritmos (onde 0 significa que o item não foi avaliado pelo usuário e 1 significa que foi). Nenhuma informação adicional é usada.</li>
+<li>É fornecida uma classificação de itens recomendados para cada usuário, com base em itens “semelhantes”.</li>
+<li>Em vez da raiz do erro quadrático médio (RMSE), podemos usar a métrica de precisão/exatidão para avaliar a precisão do modelo (veja os detalhes na seção de avaliação).</li>
+</ul>
+<h3 id="top-k-recomendações">Top-k recomendações</h3>
+<p>De acordo com as pontuações atribuídas aos pares usuário-itens, cada algoritmo do sistema de recomendação disponibiliza funções que fornecerão uma lista classificada dos <span class="katex--inline"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.69444em; vertical-align: 0em;"></span><span class="mord mathdefault" style="margin-right: 0.03148em;">k</span></span></span></span></span> itens mais recomendados para cada usuário (entre os itens que ainda não foram avaliados pelo usuário).</p>
+<ul>
+<li>
+<p>No <strong>RecommenderLab</strong>, o parâmetro <code>type='topNlist'</code> na função <code>evaluate()</code> produzirá esta lista.</p>
+</li>
+<li>
+<p>No <strong>Turi</strong>, a função <code>recommend(k)</code> para cada tipo de sistema de recomendação fará o mesmo.</p>
+</li>
+</ul>
+<h3 id="avaliação-precisãoexatidão-e-matriz-de-confusão">Avaliação: precisão/exatidão e matriz de confusão</h3>
+<ul>
+<li>
+<p>Para a avaliação com base nas top-<span class="katex--inline"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.69444em; vertical-align: 0em;"></span><span class="mord mathdefault" style="margin-right: 0.03148em;">k</span></span></span></span></span> recomendações, você pode realizá-la com a matriz de confusão ou com os valores de precisão/exatidão, a saber:</p>
+<ul>
+<li>Precisão@<span class="katex--inline"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.69444em; vertical-align: 0em;"></span><span class="mord mathdefault" style="margin-right: 0.03148em;">k</span></span></span></span></span>: proporção de itens recomendados que são relevantes.</li>
+<li>Exatidão@<span class="katex--inline"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.69444em; vertical-align: 0em;"></span><span class="mord mathdefault" style="margin-right: 0.03148em;">k</span></span></span></span></span>: proporção de itens relevantes que são recomendados.</li>
+</ul>
+</li>
+<li>
+<p>No <strong>RecommenderLab</strong>, os <code>evaluation.confusion_matrix(results)</code> (onde <code>results</code> são a saída da função <code>evaluate()</code> mencionada anteriormente) fornecerão a matriz de verdadeiros positivos, falsos negativos, falsos positivos e verdadeiros negativos, a partir da qual podemos calcular a precisão e exatidão.</p>
+</li>
+<li>
+<p>No <strong>Turi</strong>, a função abaixo também produzirá a matriz de confusão:</p>
+<pre class=" language-python"><code class="prism  language-python">evaluation<span class="token punctuation">.</span>confusion_matrix<span class="token punctuation">(</span><span class="token punctuation">)</span>
+</code></pre>
+<p>No Turi, se os modelos forem comparados (por exemplo, o sistema de recomendação com base na popularidade e o sistema de recomendação com base na similaridade do item), podemos gerar um gráfico de precisão/exatidão com a função:</p>
+<pre class=" language-python"><code class="prism  language-python">recommender<span class="token punctuation">.</span>util<span class="token punctuation">.</span>compare_models<span class="token punctuation">(</span>metric<span class="token operator">=</span><span class="token string">'precion_recall'</span><span class="token punctuation">)</span>
+</code></pre>
+<p>Isso fará com que seja exibido um gráfico de precisão/exatidão (e uma lista de valores) para vários valores de <span class="katex--inline"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.69444em; vertical-align: 0em;"></span><span class="mord mathdefault" style="margin-right: 0.03148em;">k</span></span></span></span></span> (o número de recomendações para cada usuário).</p>
+</li>
+</ul>
+<hr>
+<img src="https://drive.google.com/uc?export=view&amp;id=1du2bbjAM4VMziHc2jl9Etk7q26IxuLyy">
+<p>©2021 Massachusetts Institute of Technology</p>
+<!--stackedit_data:&#10;eyJoaXN0b3J5IjpbLTE4MDQ1OTUxMDcsLTY3OTcyODk3OSwtMT&#10;YzNzExMjg0LDE4OTQ4MDY2NDYsNDc4NjY3Mjc2LDg5OTUxMjIz&#10;OSwxNTQyMzg5NzQ3LC0yMTQ1MTUwNjk4LDEzNDkzODg1MDMsNz&#10;MwOTk4MTE2XX0=&#10;-->
+</div>
+</body>
+
+</html>
