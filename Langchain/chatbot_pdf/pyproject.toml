@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "chatbot-pdf"
+version = "0.1.0"
+description = ""
+authors = ["neuton8 <neutonsevero@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+langchain = "^0.2.14"
+streamlit = "^1.37.1"
+langchain-community = "^0.2.12"
+langchain-ollama = "^0.1.1"
+langchain-huggingface = "^0.0.3"
+poetry = "^1.8.3"
+langchain-chroma = "^0.1.3"
+tensorflow = "^2.17.0"
+protobuf = "==3.20.*"
+pymupdf = "^1.24.9"
+tf-keras = "^2.17.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
